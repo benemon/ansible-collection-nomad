@@ -2,6 +2,9 @@ ancestor: null
 releases:
   0.1.0:
     changes:
+      minor_changes:
+      - Added end-to-end example playbooks under ``examples/`` and an Examples guide
+        page that walks them.
       release_summary: 'First release of the ``benemon.nomad`` collection: modules
         and ``_info`` twins for jobs, namespaces, node pools,
 
@@ -13,6 +16,7 @@ releases:
         '
     fragments:
     - 0.1.0.yml
+    - examples.yml
     modules:
     - description: Manage a Nomad ACL policy.
       name: nomad_acl_policy
