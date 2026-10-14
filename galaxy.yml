@@ -3,8 +3,8 @@ name: nomad
 version: 0.1.0
 readme: README.md
 authors:
-  - Benjamin Holmes <benjamin.holmes@gmail.com>
-description: Manage HashiCorp Nomad and Nomad Enterprise clusters over the HTTP API
+  - Benjamin Holmes (@benemon)
+description: Manage HashiCorp Nomad Community Edition and Nomad Enterprise clusters with Ansible
 license:
   - GPL-3.0-or-later
 tags:
