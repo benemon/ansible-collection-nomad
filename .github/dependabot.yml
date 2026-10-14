@@ -1,0 +1,11 @@
+# No pip entry: requirements.txt holds a floor on nomadpy, not a pin, so there
+# is nothing for Dependabot to bump there.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]

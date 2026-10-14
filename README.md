@@ -1,5 +1,7 @@
 # benemon.nomad
 
+[![ci](https://github.com/benemon/ansible-collection-nomad/actions/workflows/ci.yml/badge.svg)](https://github.com/benemon/ansible-collection-nomad/actions/workflows/ci.yml) [![codeql](https://github.com/benemon/ansible-collection-nomad/actions/workflows/codeql.yml/badge.svg)](https://github.com/benemon/ansible-collection-nomad/actions/workflows/codeql.yml) [![release](https://github.com/benemon/ansible-collection-nomad/actions/workflows/release.yml/badge.svg)](https://github.com/benemon/ansible-collection-nomad/actions/workflows/release.yml) [![Dependabot Updates](https://github.com/benemon/ansible-collection-nomad/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/benemon/ansible-collection-nomad/actions/workflows/dependabot/dependabot-updates) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/benemon/ansible-collection-nomad/badge)](https://scorecard.dev/viewer/?uri=github.com/benemon/ansible-collection-nomad)
+
 Ansible collection for HashiCorp Nomad and Nomad Enterprise, over the HTTP
 API through [nomadpy](https://pypi.org/project/nomadpy/).
 Documentation: <https://benemon.github.io/ansible-collection-nomad/branch/main/>.

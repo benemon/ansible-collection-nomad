@@ -5,11 +5,14 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     permissions:
       contents: read
-    uses: ansible-community/github-docs-build/.github/workflows/_shared-docs-build-push.yml@main
+    uses: ansible-community/github-docs-build/.github/workflows/_shared-docs-build-push.yml@ef504dee4760a0a6257763ab56390b30dc6680ad # main
     with:
       collection-name: benemon.nomad
       ansible-ref: stable-2.19
@@ -23,7 +26,7 @@ jobs:
       contents: write
       pages: write
       id-token: write
-    uses: ansible-community/github-docs-build/.github/workflows/_shared-docs-build-publish-gh-pages.yml@main
+    uses: ansible-community/github-docs-build/.github/workflows/_shared-docs-build-publish-gh-pages.yml@ef504dee4760a0a6257763ab56390b30dc6680ad # main
     with:
       artifact-name: ${{ needs.build.outputs.artifact-name }}
     secrets:
