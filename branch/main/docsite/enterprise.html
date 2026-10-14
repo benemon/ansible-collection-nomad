@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enterprise behaviour &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="../_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="../_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7f41d439"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="prev" title="Secrets" href="secrets.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="../_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jobs.html">Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="secrets.html">Secrets</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Enterprise behaviour</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#enterprise-surfaces">Enterprise surfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-a-community-server-answers">What a Community server answers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_policy_module.html">benemon.nomad.nomad_acl_policy module – Manage a Nomad ACL policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_policy_info_module.html">benemon.nomad.nomad_acl_policy_info module – Read Nomad ACL policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_role_module.html">benemon.nomad.nomad_acl_role module – Manage a Nomad ACL role</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_role_info_module.html">benemon.nomad.nomad_acl_role_info module – Read Nomad ACL roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_module.html">benemon.nomad.nomad_acl_token module – Manage a Nomad ACL token</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_info_module.html">benemon.nomad.nomad_acl_token_info module – Read Nomad ACL tokens</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_job_module.html">benemon.nomad.nomad_job module – Register or stop a Nomad job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_job_info_module.html">benemon.nomad.nomad_job_info module – Read Nomad jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_namespace_module.html">benemon.nomad.nomad_namespace module – Manage a Nomad namespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_namespace_info_module.html">benemon.nomad.nomad_namespace_info module – Read Nomad namespaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_module.html">benemon.nomad.nomad_node module – Set the scheduling eligibility or drain of a Nomad node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_info_module.html">benemon.nomad.nomad_node_info module – Read Nomad client nodes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_pool_module.html">benemon.nomad.nomad_node_pool module – Manage a Nomad node pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_pool_info_module.html">benemon.nomad.nomad_node_pool_info module – Read Nomad node pools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_quota_module.html">benemon.nomad.nomad_quota module – Manage a Nomad quota specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_quota_info_module.html">benemon.nomad.nomad_quota_info module – Read Nomad quota specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_module.html">benemon.nomad.nomad_sentinel_policy module – Manage a Nomad Sentinel policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_info_module.html">benemon.nomad.nomad_sentinel_policy_info module – Read Nomad Sentinel policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_module.html">benemon.nomad.nomad_variable module – Manage a Nomad variable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_info_module.html">benemon.nomad.nomad_variable_info module – Read Nomad variables</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_lookup.html">benemon.nomad.nomad_variable lookup – Read a Nomad variable</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Enterprise behaviour</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <section id="enterprise-behaviour">
+<span id="ansible-collections-benemon-nomad-docsite-enterprise"></span><h1>Enterprise behaviour<a class="headerlink" href="#enterprise-behaviour" title="Link to this heading"></a></h1>
+<p>The collection presents Community and Enterprise surfaces identically. There is
+no licence detection and no client-side check of the edition: a request the
+server will not serve fails the task through the same path as any other
+refused request, with the server’s message in <code class="docutils literal notranslate"><span class="pre">msg</span></code> and the HTTP status in
+<code class="docutils literal notranslate"><span class="pre">status_code</span></code>.</p>
+<p>Which endpoints and fields are Enterprise is stated by the
+<a class="reference external" href="https://developer.hashicorp.com/nomad/api-docs">Nomad API documentation</a>,
+and each plugin option carries the same label in its description.</p>
+<section id="enterprise-surfaces">
+<h2>Enterprise surfaces<a class="headerlink" href="#enterprise-surfaces" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Endpoints</dt><dd><p><a class="reference internal" href="../nomad_quota_module.html#ansible-collections-benemon-nomad-nomad-quota-module"><span class="std std-ref">benemon.nomad.nomad_quota</span></a>,
+<a class="reference internal" href="../nomad_quota_info_module.html#ansible-collections-benemon-nomad-nomad-quota-info-module"><span class="std std-ref">benemon.nomad.nomad_quota_info</span></a>,
+<a class="reference internal" href="../nomad_sentinel_policy_module.html#ansible-collections-benemon-nomad-nomad-sentinel-policy-module"><span class="std std-ref">benemon.nomad.nomad_sentinel_policy</span></a> and
+<a class="reference internal" href="../nomad_sentinel_policy_info_module.html#ansible-collections-benemon-nomad-nomad-sentinel-policy-info-module"><span class="std std-ref">benemon.nomad.nomad_sentinel_policy_info</span></a>.
+<a class="reference external" href="https://developer.hashicorp.com/nomad/api-docs/quotas">Quotas</a> and
+<a class="reference external" href="https://developer.hashicorp.com/nomad/api-docs/sentinel-policies">Sentinel policies</a>
+need the Governance and Policy module on the licence. Sentinel policies also
+need ACLs enabled on the server.</p>
+</dd>
+<dt>Fields on Community resources</dt><dd><p><code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_namespace_module.html#ansible-collections-benemon-nomad-nomad-namespace-module-parameter-quota"><span class="std std-ref"><span class="pre">quota</span></span></a></strong></code>,
+<code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_namespace_module.html#ansible-collections-benemon-nomad-nomad-namespace-module-parameter-node-pool-configuration"><span class="std std-ref"><span class="pre">node_pool_configuration</span></span></a></strong></code>,
+<code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_namespace_module.html#ansible-collections-benemon-nomad-nomad-namespace-module-parameter-vault-configuration"><span class="std std-ref"><span class="pre">vault_configuration</span></span></a></strong></code> and
+<code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_namespace_module.html#ansible-collections-benemon-nomad-nomad-namespace-module-parameter-consul-configuration"><span class="std std-ref"><span class="pre">consul_configuration</span></span></a></strong></code> on a
+namespace; <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_node_pool_module.html#ansible-collections-benemon-nomad-nomad-node-pool-module-parameter-scheduler-configuration"><span class="std std-ref"><span class="pre">scheduler_configuration</span></span></a></strong></code>
+on a node pool; <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-policy-override"><span class="std std-ref"><span class="pre">policy_override</span></span></a></strong></code> on
+a job registration.</p>
+</dd>
+</dl>
+</section>
+<section id="what-a-community-server-answers">
+<h2>What a Community server answers<a class="headerlink" href="#what-a-community-server-answers" title="Link to this heading"></a></h2>
+<p>The responses below are what Nomad Community 2.0.5 returns. The collection’s
+integration tests assert them on the Community lane.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Request</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">status_code</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">msg</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Any quota or Sentinel policy task</p></td>
+<td><p>501</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Nomad</span> <span class="pre">Enterprise</span> <span class="pre">only</span> <span class="pre">endpoint</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>A namespace with <code class="docutils literal notranslate"><span class="pre">quota</span></code> set</p></td>
+<td><p>500</p></td>
+<td><p>names the quota specification the server cannot find</p></td>
+</tr>
+<tr class="row-even"><td><p>A node pool with <code class="docutils literal notranslate"><span class="pre">scheduler_configuration</span></code> set</p></td>
+<td><p>500</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Feature</span> <span class="pre">&quot;Node</span> <span class="pre">Pools</span> <span class="pre">Governance&quot;</span> <span class="pre">is</span> <span class="pre">unlicensed</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>A play that runs against both editions can branch on the status:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Apply the quota where the server supports it</span>
+<span class="w">  </span><span class="nt">benemon.nomad.nomad_quota</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">    </span><span class="nt">limits</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">global</span>
+<span class="w">        </span><span class="nt">region_limit</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2500</span>
+<span class="w">          </span><span class="nt">memory_mb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quota</span>
+<span class="w">  </span><span class="nt">failed_when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quota is failed and quota.status_code != 501</span>
+</pre></div>
+</div>
+<p>Reading an Enterprise resource with an <code class="docutils literal notranslate"><span class="pre">_info</span></code> module on a Community server
+fails the same way; the module does not translate the refusal into an empty
+list.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="secrets.html" class="btn btn-neutral float-left" title="Secrets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>

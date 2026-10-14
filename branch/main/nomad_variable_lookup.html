@@ -1,0 +1,402 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="2.27.0" name="antsibull-docs" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>benemon.nomad.nomad_variable lookup – Read a Nomad variable &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f41d439"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="benemon.nomad.nomad_variable_info module – Read Nomad variables" href="nomad_variable_info_module.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="docsite/getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docsite/jobs.html">Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docsite/secrets.html">Secrets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docsite/enterprise.html">Enterprise behaviour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docsite/contributing.html">Contributing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nomad_acl_policy_module.html">benemon.nomad.nomad_acl_policy module – Manage a Nomad ACL policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_acl_policy_info_module.html">benemon.nomad.nomad_acl_policy_info module – Read Nomad ACL policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_acl_role_module.html">benemon.nomad.nomad_acl_role module – Manage a Nomad ACL role</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_acl_role_info_module.html">benemon.nomad.nomad_acl_role_info module – Read Nomad ACL roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_acl_token_module.html">benemon.nomad.nomad_acl_token module – Manage a Nomad ACL token</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_acl_token_info_module.html">benemon.nomad.nomad_acl_token_info module – Read Nomad ACL tokens</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_job_module.html">benemon.nomad.nomad_job module – Register or stop a Nomad job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_job_info_module.html">benemon.nomad.nomad_job_info module – Read Nomad jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_namespace_module.html">benemon.nomad.nomad_namespace module – Manage a Nomad namespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_namespace_info_module.html">benemon.nomad.nomad_namespace_info module – Read Nomad namespaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_node_module.html">benemon.nomad.nomad_node module – Set the scheduling eligibility or drain of a Nomad node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_node_info_module.html">benemon.nomad.nomad_node_info module – Read Nomad client nodes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_node_pool_module.html">benemon.nomad.nomad_node_pool module – Manage a Nomad node pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_node_pool_info_module.html">benemon.nomad.nomad_node_pool_info module – Read Nomad node pools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_quota_module.html">benemon.nomad.nomad_quota module – Manage a Nomad quota specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_quota_info_module.html">benemon.nomad.nomad_quota_info module – Read Nomad quota specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_sentinel_policy_module.html">benemon.nomad.nomad_sentinel_policy module – Manage a Nomad Sentinel policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_sentinel_policy_info_module.html">benemon.nomad.nomad_sentinel_policy_info module – Read Nomad Sentinel policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_variable_module.html">benemon.nomad.nomad_variable module – Manage a Nomad variable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomad_variable_info_module.html">benemon.nomad.nomad_variable_info module – Read Nomad variables</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">benemon.nomad.nomad_variable lookup – Read a Nomad variable</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#terms">Terms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#keyword-parameters">Keyword parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#return-value">Return Value</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#collection-links">Collection links</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">benemon.nomad.nomad_variable lookup – Read a Nomad variable</li>
+      <li class="wy-breadcrumbs-aside">
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/benemon/ansible-collection-nomad/edit/main/plugins/lookup/nomad_variable.py?description=%23%23%23%23%23%20SUMMARY%0A%3C!—%20Your%20description%20here%20–%3E%0A%0A%0A%23%23%23%23%23%20ISSUE%20TYPE%0A-%20Docs%20Pull%20Request%0A%0A%2Blabel:%20docsite_pr" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <span class="target" id="ansible-collections-benemon-nomad-nomad-variable-lookup"></span><section id="benemon-nomad-nomad-variable-lookup-read-a-nomad-variable">
+<h1>benemon.nomad.nomad_variable lookup – Read a Nomad variable<a class="headerlink" href="#benemon-nomad-nomad-variable-lookup-read-a-nomad-variable" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This lookup plugin is part of the <a class="reference external" href="https://galaxy.ansible.com/ui/repo/published/benemon/nomad/">benemon.nomad collection</a> (version 0.1.0).</p>
+<p>It is not included in <code class="docutils literal notranslate"><span class="pre">ansible-core</span></code>.
+To check whether it is installed, run <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code>.</p>
+<p>To install it, use: <code class="code docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">install</span> <span class="pre">benemon.nomad</span></code>.
+You need further requirements to be able to use this lookup plugin,
+see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-variable-lookup-requirements"><span class="std std-ref">Requirements</span></a> for details.</p>
+<p>To use it in a playbook, specify: <code class="code docutils literal notranslate"><span class="pre">benemon.nomad.nomad_variable</span></code>.</p>
+</div>
+<p class="ansible-version-added">New in benemon.nomad 0.1.0</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#requirements" id="id2">Requirements</a></p></li>
+<li><p><a class="reference internal" href="#terms" id="id3">Terms</a></p></li>
+<li><p><a class="reference internal" href="#keyword-parameters" id="id4">Keyword parameters</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id5">Notes</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id6">Examples</a></p></li>
+<li><p><a class="reference internal" href="#return-value" id="id7">Return Value</a></p></li>
+</ul>
+</nav>
+<section id="synopsis">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Return the items of a variable, or one item of it, read inline.</p></li>
+<li><p>A variable that does not exist is an error.</p></li>
+</ul>
+</section>
+<section id="requirements">
+<span id="ansible-collections-benemon-nomad-nomad-variable-lookup-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p>The below requirements are needed on the local controller node that executes this lookup.</p>
+<ul class="simple">
+<li><p>nomadpy &gt;= 0.1.0</p></li>
+</ul>
+</section>
+<section id="terms">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Terms</a><a class="headerlink" href="#terms" title="Link to this heading"></a></h2>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-_terms"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-terms"><strong>Terms</strong></p>
+<a class="ansibleOptionLink" href="#parameter-_terms" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span> / <span class="ansible-option-required">required</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Paths of the variables to read.</p>
+</div></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="keyword-parameters">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Keyword parameters</a><a class="headerlink" href="#keyword-parameters" title="Link to this heading"></a></h2>
+<p>This describes keyword parameters of the lookup. These are the values <code class="docutils literal notranslate"><span class="pre">key1=value1</span></code>, <code class="docutils literal notranslate"><span class="pre">key2=value2</span></code> and so on in the following
+examples: <code class="docutils literal notranslate"><span class="pre">lookup('benemon.nomad.nomad_variable',</span> <span class="pre">key1=value1,</span> <span class="pre">key2=value2,</span> <span class="pre">...)</span></code> and <code class="docutils literal notranslate"><span class="pre">query('benemon.nomad.nomad_variable',</span> <span class="pre">key1=value1,</span> <span class="pre">key2=value2,</span> <span class="pre">...)</span></code></p>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-address"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-address"><strong>address</strong></p>
+<a class="ansibleOptionLink" href="#parameter-address" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Address of the Nomad HTTP API, including the scheme.</p>
+<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_ADDR</span></code>, then <code class="ansible-value docutils literal notranslate"><span class="pre">http://127.0.0.1:4646</span></code>.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-ca_cert"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-ca-cert"><strong>ca_cert</strong></p>
+<a class="ansibleOptionLink" href="#parameter-ca_cert" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Path to a CA certificate file to verify the server against.</p>
+<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CACERT</span></code>.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-ca_path"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-ca-path"><strong>ca_path</strong></p>
+<a class="ansibleOptionLink" href="#parameter-ca_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Path to a directory of CA certificates to verify the server against.</p>
+<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CAPATH</span></code>.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-client_cert"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-client-cert"><strong>client_cert</strong></p>
+<a class="ansibleOptionLink" href="#parameter-client_cert" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Path to the client certificate for TLS authentication.</p>
+<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CLIENT_CERT</span></code>.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-client_key"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-client-key"><strong>client_key</strong></p>
+<a class="ansibleOptionLink" href="#parameter-client_key" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Path to the private key of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-client-cert"><span class="std std-ref"><span class="pre">client_cert</span></span></a></strong></code>.</p>
+<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CLIENT_KEY</span></code>.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-key"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-key"><strong>key</strong></p>
+<a class="ansibleOptionLink" href="#parameter-key" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Return only this item’s value instead of the items dict. An item that does not exist is an error.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-namespace"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-namespace"><strong>namespace</strong></p>
+<a class="ansibleOptionLink" href="#parameter-namespace" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Namespace the resource lives in.</p>
+<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_NAMESPACE</span></code>, then <code class="ansible-value docutils literal notranslate"><span class="pre">default</span></code>.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-region"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-region"><strong>region</strong></p>
+<a class="ansibleOptionLink" href="#parameter-region" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Region to send requests to.</p>
+<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_REGION</span></code>, then the region of the server answering.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-skip_verify"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-skip-verify"><strong>skip_verify</strong></p>
+<a class="ansibleOptionLink" href="#parameter-skip_verify" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Do not verify the server certificate.</p>
+<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_SKIP_VERIFY</span></code>.</p>
+<p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
+<ul class="simple">
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">true</span></code></p></li>
+</ul>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-tls_server_name"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-tls-server-name"><strong>tls_server_name</strong></p>
+<a class="ansibleOptionLink" href="#parameter-tls_server_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Server name to verify the certificate against instead of the host in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-address"><span class="std std-ref"><span class="pre">address</span></span></a></strong></code>.</p>
+<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TLS_SERVER_NAME</span></code>.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-token"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-token"><strong>token</strong></p>
+<a class="ansibleOptionLink" href="#parameter-token" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>ACL token secret sent with every request.</p>
+<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TOKEN</span></code>.</p>
+</div></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="notes">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Notes</a><a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>When keyword and positional parameters are used together, positional parameters must be listed before keyword parameters:
+<code class="docutils literal notranslate"><span class="pre">lookup('benemon.nomad.nomad_variable',</span> <span class="pre">term1,</span> <span class="pre">term2,</span> <span class="pre">key1=value1,</span> <span class="pre">key2=value2)</span></code> and <code class="docutils literal notranslate"><span class="pre">query('benemon.nomad.nomad_variable',</span> <span class="pre">term1,</span> <span class="pre">term2,</span> <span class="pre">key1=value1,</span> <span class="pre">key2=value2)</span></code></p></li>
+<li><p>Connection options fall back to the environment variables the Nomad CLI reads, with the same meaning.</p></li>
+<li><p>Enterprise features are not checked client-side. On a Community server the request fails with the server’s own error.</p></li>
+</ul>
+</div>
+</section>
+<section id="examples">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Read every item of a variable</span>
+<span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">'benemon.nomad.nomad_variable'</span><span class="o">,</span> <span class="s1">'db/credentials'</span><span class="o">,</span> <span class="nv">namespace</span><span class="o">=</span><span class="s1">'web'</span><span class="o">)</span> <span class="cp">}}</span><span class="s">"</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Read one item</span>
+<span class="w">  </span><span class="nt">ansible.builtin.debug</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">'benemon.nomad.nomad_variable'</span><span class="o">,</span> <span class="s1">'db/credentials'</span><span class="o">,</span> <span class="nv">key</span><span class="o">=</span><span class="s1">'username'</span><span class="o">)</span> <span class="cp">}}</span><span class="s">"</span>
+</pre></div>
+</div>
+</section>
+<section id="return-value">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Return Value</a><a class="headerlink" href="#return-value" title="Link to this heading"></a></h2>
+<table class="longtable ansible-option-table docutils align-default" style="width: 100%">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="return-_raw"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-variable-lookup-return-raw"><strong>Return value</strong></p>
+<a class="ansibleOptionLink" href="#return-_raw" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=any</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>The item dictionary of each path, or the value of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-variable-lookup-parameter-key"><span class="std std-ref"><span class="pre">key</span></span></a></strong></code> in each.</p>
+<p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success</p>
+</div></td>
+</tr>
+</tbody>
+</table>
+<section id="authors">
+<h3>Authors<a class="headerlink" href="#authors" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Benjamin Holmes (&#64;benemon)</p></li>
+</ul>
+</section>
+<section id="collection-links">
+<h3>Collection links<a class="headerlink" href="#collection-links" title="Link to this heading"></a></h3>
+<ul class="ansible-links">
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/benemon/ansible-collection-nomad/issues" rel="noopener external" target="_blank">Issue Tracker</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/benemon/ansible-collection-nomad" rel="noopener external" target="_blank">Repository (Sources)</a></span></li>
+<li><span><a aria-role="button" class="ansible-link reference external" href="https://github.com/benemon/ansible-collection-nomad/blob/main/CHANGELOG.rst" rel="noopener external" target="_blank">Changelog</a></span></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nomad_variable_info_module.html" class="btn btn-neutral float-left" title="benemon.nomad.nomad_variable_info module – Read Nomad variables" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>

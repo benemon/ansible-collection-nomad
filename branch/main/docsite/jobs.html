@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jobs &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="../_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="../_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7f41d439"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Secrets" href="secrets.html" />
+    <link rel="prev" title="Getting started" href="getting_started.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="../_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Jobs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-jobspec-option">The jobspec option</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#change-detection-and-diff">Change detection and diff</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#waiting">Waiting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stopping">Stopping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reading">Reading</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="secrets.html">Secrets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="enterprise.html">Enterprise behaviour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_policy_module.html">benemon.nomad.nomad_acl_policy module – Manage a Nomad ACL policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_policy_info_module.html">benemon.nomad.nomad_acl_policy_info module – Read Nomad ACL policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_role_module.html">benemon.nomad.nomad_acl_role module – Manage a Nomad ACL role</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_role_info_module.html">benemon.nomad.nomad_acl_role_info module – Read Nomad ACL roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_module.html">benemon.nomad.nomad_acl_token module – Manage a Nomad ACL token</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_info_module.html">benemon.nomad.nomad_acl_token_info module – Read Nomad ACL tokens</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_job_module.html">benemon.nomad.nomad_job module – Register or stop a Nomad job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_job_info_module.html">benemon.nomad.nomad_job_info module – Read Nomad jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_namespace_module.html">benemon.nomad.nomad_namespace module – Manage a Nomad namespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_namespace_info_module.html">benemon.nomad.nomad_namespace_info module – Read Nomad namespaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_module.html">benemon.nomad.nomad_node module – Set the scheduling eligibility or drain of a Nomad node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_info_module.html">benemon.nomad.nomad_node_info module – Read Nomad client nodes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_pool_module.html">benemon.nomad.nomad_node_pool module – Manage a Nomad node pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_pool_info_module.html">benemon.nomad.nomad_node_pool_info module – Read Nomad node pools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_quota_module.html">benemon.nomad.nomad_quota module – Manage a Nomad quota specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_quota_info_module.html">benemon.nomad.nomad_quota_info module – Read Nomad quota specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_module.html">benemon.nomad.nomad_sentinel_policy module – Manage a Nomad Sentinel policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_info_module.html">benemon.nomad.nomad_sentinel_policy_info module – Read Nomad Sentinel policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_module.html">benemon.nomad.nomad_variable module – Manage a Nomad variable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_info_module.html">benemon.nomad.nomad_variable_info module – Read Nomad variables</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_lookup.html">benemon.nomad.nomad_variable lookup – Read a Nomad variable</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Jobs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <section id="jobs">
+<span id="ansible-collections-benemon-nomad-docsite-jobs"></span><h1>Jobs<a class="headerlink" href="#jobs" title="Link to this heading"></a></h1>
+<p><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module"><span class="std std-ref">benemon.nomad.nomad_job</span></a> registers a job from its
+specification and <a class="reference internal" href="../nomad_job_info_module.html#ansible-collections-benemon-nomad-nomad-job-info-module"><span class="std std-ref">benemon.nomad.nomad_job_info</span></a> reads jobs
+back. Both are in the <code class="docutils literal notranslate"><span class="pre">default</span></code> namespace unless <code class="docutils literal notranslate"><span class="pre">namespace</span></code> or
+<code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_NAMESPACE</span></code> says otherwise.</p>
+<section id="the-jobspec-option">
+<h2>The jobspec option<a class="headerlink" href="#the-jobspec-option" title="Link to this heading"></a></h2>
+<p><code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-jobspec"><span class="std std-ref"><span class="pre">jobspec</span></span></a></strong></code> takes the job specification in
+one of three forms. The module decides which by looking at the value.</p>
+<dl>
+<dt>HCL text</dt><dd><p>A string that is not JSON is sent to the server’s parse endpoint and
+converted there. The <a class="reference external" href="https://developer.hashicorp.com/nomad/docs/job-specification">job specification</a>
+must be valid for the server’s version; no HCL is parsed on the controller.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Register a job from an HCL file</span>
+<span class="w">  </span><span class="nt">benemon.nomad.nomad_job</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">jobspec</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">lookup('ansible.builtin.file',</span><span class="nv"> </span><span class="s">'web.nomad.hcl')</span><span class="nv"> </span><span class="s">}}"</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Register a job from an HCL template</span>
+<span class="w">  </span><span class="nt">benemon.nomad.nomad_job</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">jobspec</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">lookup('ansible.builtin.template',</span><span class="nv"> </span><span class="s">'web.nomad.hcl.j2')</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+</pre></div>
+</div>
+</dd>
+<dt>JSON document as text</dt><dd><p>A string that parses as a JSON object is used as the job document directly.
+This is the shape <code class="docutils literal notranslate"><span class="pre">nomad</span> <span class="pre">job</span> <span class="pre">run</span> <span class="pre">-output</span></code> prints and the
+<a class="reference external" href="https://developer.hashicorp.com/nomad/api-docs/json-jobs">JSON job specification</a>
+documents.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Register a job from its JSON document</span>
+<span class="w">  </span><span class="nt">benemon.nomad.nomad_job</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">jobspec</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">lookup('ansible.builtin.file',</span><span class="nv"> </span><span class="s">'web.json')</span><span class="nv"> </span><span class="s">}}"</span>
+</pre></div>
+</div>
+</dd>
+<dt>The document itself</dt><dd><p>A dict is used as the job document without conversion. It can come from a
+variable, from <code class="docutils literal notranslate"><span class="pre">from_json</span></code> or <code class="docutils literal notranslate"><span class="pre">from_yaml</span></code> on a file, or be written
+inline in the play.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Register a job from a document held in a variable</span>
+<span class="w">  </span><span class="nt">benemon.nomad.nomad_job</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">jobspec</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">lookup('ansible.builtin.file',</span><span class="nv"> </span><span class="s">'web.json')</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">from_json</span><span class="nv"> </span><span class="s">}}"</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Register a job written inline</span>
+<span class="w">  </span><span class="nt">benemon.nomad.nomad_job</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">jobspec</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">ID</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">      </span><span class="nt">Name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">      </span><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">service</span>
+<span class="w">      </span><span class="nt">Datacenters</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">dc1</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">TaskGroups</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">          </span><span class="nt">Tasks</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">              </span><span class="nt">Driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker</span>
+<span class="w">              </span><span class="nt">Config</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx:1.27</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>In every form the document must carry an <code class="docutils literal notranslate"><span class="pre">ID</span></code>. <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code>
+is optional with a specification; when set it must match that ID, and a mismatch
+fails the task.</p>
+</section>
+<section id="change-detection-and-diff">
+<h2>Change detection and diff<a class="headerlink" href="#change-detection-and-diff" title="Link to this heading"></a></h2>
+<p>The server’s plan endpoint decides whether the submitted document changes
+anything. A job that is already registered in that form reports
+<code class="docutils literal notranslate"><span class="pre">changed:</span> <span class="pre">false</span></code> and returns the job as the server holds it. The plan is also
+what check mode reports.</p>
+<p>The diff shows the job document on the server as <code class="docutils literal notranslate"><span class="pre">before</span></code> and the submitted
+document as <code class="docutils literal notranslate"><span class="pre">after</span></code>. The two come from different sources, so fields the server
+fills in at registration, such as <code class="docutils literal notranslate"><span class="pre">CreateIndex</span></code>, <code class="docutils literal notranslate"><span class="pre">Version</span></code> and <code class="docutils literal notranslate"><span class="pre">Status</span></code>,
+appear in <code class="docutils literal notranslate"><span class="pre">before</span></code> only, and a diff can show lines the plan does not count
+as a change.</p>
+</section>
+<section id="waiting">
+<h2>Waiting<a class="headerlink" href="#waiting" title="Link to this heading"></a></h2>
+<p>By default a registration waits. The module blocks on the evaluation the
+registration created until it completes, then, for a job that has a deployment,
+on the latest deployment until it reaches a terminal status. A deployment that
+ends anywhere other than <code class="docutils literal notranslate"><span class="pre">successful</span></code> fails the task, as does an evaluation
+whose allocations cannot all be placed; the failed deployment or the
+<code class="docutils literal notranslate"><span class="pre">FailedTGAllocs</span></code> of the evaluation are in the failure result.</p>
+<p><code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-timeout"><span class="std std-ref"><span class="pre">timeout</span></span></a></strong></code> bounds the whole wait, 300
+seconds by default. With <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-wait"><span class="std std-ref"><span class="pre">wait=false</span></span></a></code>
+the task returns as soon as the server accepts the registration, with
+<code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-return-eval-id"><span class="std std-ref"><span class="pre">eval_id</span></span></a></code> for the caller to follow.</p>
+<p>The returned <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-return-job"><span class="std std-ref"><span class="pre">job</span></span></a></code> is read back after
+the wait, and <code class="ansible-return-value docutils literal notranslate"><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-return-deployment"><span class="std std-ref"><span class="pre">deployment</span></span></a></code> is the
+deployment the module waited for, when there was one.</p>
+</section>
+<section id="stopping">
+<h2>Stopping<a class="headerlink" href="#stopping" title="Link to this heading"></a></h2>
+<p><code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-state"><span class="std std-ref"><span class="pre">state=absent</span></span></a></code> stops the job named by
+<code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code>. A job that is already stopped
+reports no change unless <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-purge"><span class="std std-ref"><span class="pre">purge=true</span></span></a></code>
+asks for it to be removed from the server as well. Stopping waits for its
+evaluation under the same <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-wait"><span class="std std-ref"><span class="pre">wait</span></span></a></strong></code> and
+<code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-timeout"><span class="std std-ref"><span class="pre">timeout</span></span></a></strong></code>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Stop and purge a job</span>
+<span class="w">  </span><span class="nt">benemon.nomad.nomad_job</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absent</span>
+<span class="w">    </span><span class="nt">purge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</section>
+<section id="reading">
+<h2>Reading<a class="headerlink" href="#reading" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="../nomad_job_info_module.html#ansible-collections-benemon-nomad-nomad-job-info-module"><span class="std std-ref">benemon.nomad.nomad_job_info</span></a> returns one job in full by
+<code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_info_module.html#ansible-collections-benemon-nomad-nomad-job-info-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code>, or without it the list stubs
+the <a class="reference external" href="https://developer.hashicorp.com/nomad/api-docs/jobs#list-jobs">jobs list endpoint</a>
+returns for the namespace. A job that does not exist is an empty list.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="secrets.html" class="btn btn-neutral float-right" title="Secrets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>

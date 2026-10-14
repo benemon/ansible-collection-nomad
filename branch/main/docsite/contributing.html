@@ -1,0 +1,255 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contributing &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="../_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="../_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7f41d439"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="benemon.nomad.nomad_acl_policy module – Manage a Nomad ACL policy" href="../nomad_acl_policy_module.html" />
+    <link rel="prev" title="Enterprise behaviour" href="enterprise.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="../_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jobs.html">Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="secrets.html">Secrets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="enterprise.html">Enterprise behaviour</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#local-setup">Local setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test-lanes">Test lanes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#changelog">Changelog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#releases">Releases</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_policy_module.html">benemon.nomad.nomad_acl_policy module – Manage a Nomad ACL policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_policy_info_module.html">benemon.nomad.nomad_acl_policy_info module – Read Nomad ACL policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_role_module.html">benemon.nomad.nomad_acl_role module – Manage a Nomad ACL role</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_role_info_module.html">benemon.nomad.nomad_acl_role_info module – Read Nomad ACL roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_module.html">benemon.nomad.nomad_acl_token module – Manage a Nomad ACL token</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_info_module.html">benemon.nomad.nomad_acl_token_info module – Read Nomad ACL tokens</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_job_module.html">benemon.nomad.nomad_job module – Register or stop a Nomad job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_job_info_module.html">benemon.nomad.nomad_job_info module – Read Nomad jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_namespace_module.html">benemon.nomad.nomad_namespace module – Manage a Nomad namespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_namespace_info_module.html">benemon.nomad.nomad_namespace_info module – Read Nomad namespaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_module.html">benemon.nomad.nomad_node module – Set the scheduling eligibility or drain of a Nomad node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_info_module.html">benemon.nomad.nomad_node_info module – Read Nomad client nodes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_pool_module.html">benemon.nomad.nomad_node_pool module – Manage a Nomad node pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_pool_info_module.html">benemon.nomad.nomad_node_pool_info module – Read Nomad node pools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_quota_module.html">benemon.nomad.nomad_quota module – Manage a Nomad quota specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_quota_info_module.html">benemon.nomad.nomad_quota_info module – Read Nomad quota specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_module.html">benemon.nomad.nomad_sentinel_policy module – Manage a Nomad Sentinel policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_info_module.html">benemon.nomad.nomad_sentinel_policy_info module – Read Nomad Sentinel policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_module.html">benemon.nomad.nomad_variable module – Manage a Nomad variable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_info_module.html">benemon.nomad.nomad_variable_info module – Read Nomad variables</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_lookup.html">benemon.nomad.nomad_variable lookup – Read a Nomad variable</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Contributing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <section id="contributing">
+<span id="ansible-collections-benemon-nomad-docsite-contributing"></span><h1>Contributing<a class="headerlink" href="#contributing" title="Link to this heading"></a></h1>
+<p>The repository is <a class="reference external" href="https://github.com/benemon/ansible-collection-nomad">benemon/ansible-collection-nomad</a>.
+The collection talks to Nomad through nomadpy only; a change that needs a new
+API call starts in <a class="reference external" href="https://pypi.org/project/nomadpy/">nomadpy</a>.</p>
+<section id="local-setup">
+<h2>Local setup<a class="headerlink" href="#local-setup" title="Link to this heading"></a></h2>
+<p>Create <code class="docutils literal notranslate"><span class="pre">.venv</span></code> at the repository root with ansible-core, nomadpy and pytest on
+Python 3.14, and have <code class="docutils literal notranslate"><span class="pre">rsync</span></code> on the path. <code class="docutils literal notranslate"><span class="pre">ansible-test</span></code> needs the
+collection in an <code class="docutils literal notranslate"><span class="pre">ansible_collections/benemon/nomad</span></code> directory, so the
+<code class="docutils literal notranslate"><span class="pre">Makefile</span></code> copies the repository to one under <code class="docutils literal notranslate"><span class="pre">$TMPDIR</span></code> before each target.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">make sanity</span>
+<span class="go">make units</span>
+<span class="go">make integration</span>
+</pre></div>
+</div>
+</section>
+<section id="test-lanes">
+<h2>Test lanes<a class="headerlink" href="#test-lanes" title="Link to this heading"></a></h2>
+<p>Integration tests start a Nomad dev agent with ACLs enabled from a binary
+named explicitly, bootstrap it, and run <code class="docutils literal notranslate"><span class="pre">ansible-test</span> <span class="pre">integration</span></code> against
+it. There are two lanes, and each is selected by its variables. A lane whose
+variables are unset is skipped; a run with no lane set fails.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Lane</p></th>
+<th class="head"><p>Variables</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Community</p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMADPY_TEST_CE_BIN</span></code>, the path of a Community <code class="docutils literal notranslate"><span class="pre">nomad</span></code> binary</p></td>
+</tr>
+<tr class="row-odd"><td><p>Enterprise</p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMADPY_TEST_ENT_BIN</span></code>, the path of an Enterprise <code class="docutils literal notranslate"><span class="pre">nomad</span></code> binary,
+and <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_LICENSE_PATH</span></code>, the path of its licence file</p></td>
+</tr>
+</tbody>
+</table>
+<p>The targets read <code class="docutils literal notranslate"><span class="pre">nomad_enterprise</span></code> from the lane and assert the Community
+responses listed in <a class="reference internal" href="enterprise.html#ansible-collections-benemon-nomad-docsite-enterprise"><span class="std std-ref">Enterprise behaviour</span></a>
+on the Community lane. A target for an Enterprise surface must pass on both.</p>
+<p>CI runs sanity, units and integration on the oldest and newest supported
+ansible-core. It downloads both editions of Nomad and runs the Enterprise lane
+when the <code class="docutils literal notranslate"><span class="pre">NOMAD_LICENCE</span></code> repository secret is set, so a fork without the
+secret runs the Community lane and stays green.</p>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h2>
+<p>The site is built from the <code class="docutils literal notranslate"><span class="pre">DOCUMENTATION</span></code>, <code class="docutils literal notranslate"><span class="pre">EXAMPLES</span></code> and <code class="docutils literal notranslate"><span class="pre">RETURN</span></code> blocks
+of each plugin and from the pages under <code class="docutils literal notranslate"><span class="pre">docs/docsite/rst/</span></code>. The build fails
+on malformed documentation and on a page that references an option, return
+value or plugin that does not exist, so it is run on every push and pull
+request. To build it locally:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install antsibull-docs</span>
+<span class="go">make tree</span>
+<span class="go">export ANSIBLE_COLLECTIONS_PATH=${TMPDIR:-/tmp}/benemon-nomad</span>
+<span class="go">antsibull-docs sphinx-init --use-current --fail-on-error --squash-hierarchy --dest-dir /tmp/nomad-docs benemon.nomad</span>
+<span class="go">pip install -r /tmp/nomad-docs/requirements.txt</span>
+<span class="go">/tmp/nomad-docs/build.sh</span>
+</pre></div>
+</div>
+<p>The result is under <code class="docutils literal notranslate"><span class="pre">/tmp/nomad-docs/build/html</span></code>.</p>
+</section>
+<section id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h2>
+<p>Every user-visible change carries a fragment under <code class="docutils literal notranslate"><span class="pre">changelogs/fragments/</span></code>,
+in the <a class="reference external" href="https://ansible.readthedocs.io/projects/antsibull-changelog/changelogs/">antsibull-changelog format</a>.
+A new plugin carries <code class="docutils literal notranslate"><span class="pre">version_added</span></code> instead of a fragment and the release
+step lists it from that. <code class="docutils literal notranslate"><span class="pre">antsibull-changelog</span> <span class="pre">lint</span></code> checks the fragments.</p>
+<p>Before a release, <code class="docutils literal notranslate"><span class="pre">antsibull-changelog</span> <span class="pre">release</span></code> folds the fragments into
+<code class="docutils literal notranslate"><span class="pre">changelogs/changelog.yaml</span></code> and regenerates <code class="docutils literal notranslate"><span class="pre">CHANGELOG.rst</span></code>; the fragments
+are removed in the same step. Commit the result, then tag.</p>
+</section>
+<section id="releases">
+<h2>Releases<a class="headerlink" href="#releases" title="Link to this heading"></a></h2>
+<p>A release is a tag <code class="docutils literal notranslate"><span class="pre">v&lt;version&gt;</span></code> matching <code class="docutils literal notranslate"><span class="pre">version</span></code> in <code class="docutils literal notranslate"><span class="pre">galaxy.yml</span></code>. The
+release workflow refuses a tag that does not match, requires a green test run
+for the tagged commit, builds the collection, publishes it to Ansible Galaxy and
+creates the GitHub release.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="enterprise.html" class="btn btn-neutral float-left" title="Enterprise behaviour" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../nomad_acl_policy_module.html" class="btn btn-neutral float-right" title="benemon.nomad.nomad_acl_policy module – Manage a Nomad ACL policy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>

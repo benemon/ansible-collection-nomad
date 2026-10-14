@@ -1,0 +1,277 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting started &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="../_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="../_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7f41d439"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Jobs" href="jobs.html" />
+    <link rel="prev" title="Benemon.Nomad" href="../index.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="../_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install">Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connection-options">Connection options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-the-modules-behave">How the modules behave</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="jobs.html">Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="secrets.html">Secrets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="enterprise.html">Enterprise behaviour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_policy_module.html">benemon.nomad.nomad_acl_policy module – Manage a Nomad ACL policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_policy_info_module.html">benemon.nomad.nomad_acl_policy_info module – Read Nomad ACL policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_role_module.html">benemon.nomad.nomad_acl_role module – Manage a Nomad ACL role</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_role_info_module.html">benemon.nomad.nomad_acl_role_info module – Read Nomad ACL roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_module.html">benemon.nomad.nomad_acl_token module – Manage a Nomad ACL token</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_info_module.html">benemon.nomad.nomad_acl_token_info module – Read Nomad ACL tokens</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_job_module.html">benemon.nomad.nomad_job module – Register or stop a Nomad job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_job_info_module.html">benemon.nomad.nomad_job_info module – Read Nomad jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_namespace_module.html">benemon.nomad.nomad_namespace module – Manage a Nomad namespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_namespace_info_module.html">benemon.nomad.nomad_namespace_info module – Read Nomad namespaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_module.html">benemon.nomad.nomad_node module – Set the scheduling eligibility or drain of a Nomad node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_info_module.html">benemon.nomad.nomad_node_info module – Read Nomad client nodes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_pool_module.html">benemon.nomad.nomad_node_pool module – Manage a Nomad node pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_pool_info_module.html">benemon.nomad.nomad_node_pool_info module – Read Nomad node pools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_quota_module.html">benemon.nomad.nomad_quota module – Manage a Nomad quota specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_quota_info_module.html">benemon.nomad.nomad_quota_info module – Read Nomad quota specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_module.html">benemon.nomad.nomad_sentinel_policy module – Manage a Nomad Sentinel policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_info_module.html">benemon.nomad.nomad_sentinel_policy_info module – Read Nomad Sentinel policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_module.html">benemon.nomad.nomad_variable module – Manage a Nomad variable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_info_module.html">benemon.nomad.nomad_variable_info module – Read Nomad variables</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_lookup.html">benemon.nomad.nomad_variable lookup – Read a Nomad variable</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting started</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<span id="ansible-collections-benemon-nomad-docsite-getting-started"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<p>The <a class="reference internal" href="../index.html#plugins-in-benemon-nomad"><span class="std std-ref">benemon.nomad</span></a> collection manages HashiCorp Nomad and Nomad
+Enterprise over the HTTP API, through the <a class="reference external" href="https://pypi.org/project/nomadpy/">nomadpy</a>
+client. Every plugin runs on the controller or a delegated host that can reach
+the API; nothing runs on the Nomad servers themselves.</p>
+<section id="install">
+<h2>Install<a class="headerlink" href="#install" title="Link to this heading"></a></h2>
+<p>The collection requires ansible-core 2.19 or newer and nomadpy 0.1.0 or newer on
+the host that runs the plugins.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ansible-galaxy collection install benemon.nomad</span>
+<span class="go">pip install -r ~/.ansible/collections/ansible_collections/benemon/nomad/requirements.txt</span>
+</pre></div>
+</div>
+</section>
+<section id="connection-options">
+<h2>Connection options<a class="headerlink" href="#connection-options" title="Link to this heading"></a></h2>
+<p>Every plugin takes the same connection options. Each one falls back to the
+environment variable the <a class="reference external" href="https://developer.hashicorp.com/nomad/docs/commands#environment-variables">Nomad CLI</a>
+reads, with the same meaning.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Environment variable</p></th>
+<th class="head"><p>Default</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">address</span></code></p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_ADDR</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:4646</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">token</span></code></p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TOKEN</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">namespace</span></code></p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_NAMESPACE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">default</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">region</span></code></p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_REGION</span></code></p></td>
+<td><p>the region of the server answering</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ca_cert</span></code></p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CACERT</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ca_path</span></code></p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CAPATH</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">client_cert</span></code></p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CLIENT_CERT</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">client_key</span></code></p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CLIENT_KEY</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tls_server_name</span></code></p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TLS_SERVER_NAME</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">skip_verify</span></code></p></td>
+<td><p><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_SKIP_VERIFY</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">namespace</span></code> is present only on plugins whose resource lives in a namespace:
+jobs and variables. ACL resources, namespaces, node pools, nodes, quotas and
+Sentinel policies are cluster-wide.</p>
+<p>The modules form the <code class="docutils literal notranslate"><span class="pre">benemon.nomad.nomad</span></code> action group, so a play can set the
+connection once with <code class="docutils literal notranslate"><span class="pre">module_defaults</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span>
+<span class="w">  </span><span class="nt">module_defaults</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">group/benemon.nomad.nomad</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://nomad.example.com:4646</span>
+<span class="w">      </span><span class="nt">token</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">nomad_token</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benemon.nomad.nomad_namespace</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Web tier</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../nomad_variable_lookup.html#ansible-collections-benemon-nomad-nomad-variable-lookup"><span class="std std-ref">benemon.nomad.nomad_variable</span></a> lookup is outside the
+action group and does not see <code class="docutils literal notranslate"><span class="pre">module_defaults</span></code>. Pass its connection options
+as keyword arguments or set the environment variables.</p>
+</section>
+<section id="how-the-modules-behave">
+<h2>How the modules behave<a class="headerlink" href="#how-the-modules-behave" title="Link to this heading"></a></h2>
+<p>A state module reads the resource first and reports <code class="docutils literal notranslate"><span class="pre">changed</span></code> only when the
+server’s state differs from the options that were set. An option left out keeps
+its current value on the server. A dict option that is set replaces the whole
+nested structure. Check mode and diff mode are supported throughout.</p>
+<p>Returned resources are the Nomad API documents with the API’s field names, so
+<code class="docutils literal notranslate"><span class="pre">result.namespace.Name</span></code> and <code class="docutils literal notranslate"><span class="pre">result.job.TaskGroups</span></code> read as the
+<a class="reference external" href="https://developer.hashicorp.com/nomad/api-docs">API documentation</a> describes
+them.</p>
+<p>A request the server refuses fails the task with the server’s message in <code class="docutils literal notranslate"><span class="pre">msg</span></code>
+and the HTTP status in <code class="docutils literal notranslate"><span class="pre">status_code</span></code>. See
+<a class="reference internal" href="enterprise.html#ansible-collections-benemon-nomad-docsite-enterprise"><span class="std std-ref">Enterprise behaviour</span></a> for the responses a
+Community server gives to Enterprise requests.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Benemon.Nomad" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="jobs.html" class="btn btn-neutral float-right" title="Jobs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>
