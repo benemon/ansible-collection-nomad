@@ -198,9 +198,14 @@ inline in the play.</p>
 </div>
 </dd>
 </dl>
-<p>In every form the document must carry an <code class="docutils literal notranslate"><span class="pre">ID</span></code>. <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code>
-is optional with a specification; when set it must match that ID, and a mismatch
-fails the task.</p>
+<p>In every form the document must carry an <code class="docutils literal notranslate"><span class="pre">ID</span></code>, so
+<code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code> is not set with a specification.
+The same rule holds for <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-namespace"><span class="std std-ref"><span class="pre">namespace</span></span></a></strong></code> and
+<code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-region"><span class="std std-ref"><span class="pre">region</span></span></a></strong></code>: a value is given either on the
+module or in the specification, and the task fails when both carry one. Nothing
+is overridden and nothing is ignored. A document read back from the API carries
+all three, so a round trip is registered without those options; a specification
+meant to be registered under several names or namespaces is a template.</p>
 </section>
 <section id="change-detection-and-diff">
 <h2>Change detection and diff<a class="headerlink" href="#change-detection-and-diff" title="Link to this heading"></a></h2>
