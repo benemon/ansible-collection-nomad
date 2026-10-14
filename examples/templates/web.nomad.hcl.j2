@@ -7,7 +7,7 @@ job "{{ prefix }}-web" {
 
     update {
       min_healthy_time = "1s"
-      healthy_deadline = "30s"
+      healthy_deadline = "5m"
     }
 
     task "web" {
