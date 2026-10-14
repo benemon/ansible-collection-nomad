@@ -13,17 +13,25 @@ description:
   - The diff shows the job on the server before and the submitted document after.
   - A value is given in one place only. O(name), O(namespace) and O(region) fail the task when the specification
     also carries C(ID), C(Namespace) or C(Region); nothing is overridden and nothing is ignored. A document read back
-    from the API carries all three, so it is registered without those options.
+    from the API carries all three, so it is registered without those options. A C(Namespace) or C(Region) in the
+    specification is the one the job is read and planned in.
   - By default the module waits for the evaluation and, for service jobs, for the deployment to finish, and fails when
     allocations cannot be placed or the deployment fails.
 options:
   jobspec:
     description:
       - The job specification as HCL text, as a JSON document in text, or as the document itself.
-      - HCL is converted by the server, so it must be valid for the server's version. The document is the shape
-        C(nomad job run -output) prints and the API documents.
+      - HCL is converted by the server, so it must be valid for the server's version, and is registered with its
+        source as the job's submission, the record C(nomad job run) keeps and the UI shows as the job spec. The
+        document is the shape C(nomad job run -output) prints and the API documents.
       - Required when O(state=present).
     type: raw
+  hcl_variables:
+    description:
+      - Values for the C(variable) blocks of an HCL specification, passed to the server's parse endpoint.
+      - Only for HCL input; the task fails when O(jobspec) is a document. Values are strings, numbers, booleans or
+        lists of those.
+    type: dict
   name:
     description:
       - The job ID, for O(state=absent).
@@ -69,6 +77,13 @@ EXAMPLES = r"""
     jobspec: "{{ lookup('ansible.builtin.template', 'web.nomad.hcl.j2') }}"
     namespace: web
 
+- name: Register an HCL specification that declares variables
+  benemon.nomad.nomad_job:
+    jobspec: "{{ lookup('ansible.builtin.file', 'web.nomad.hcl') }}"
+    hcl_variables:
+      count: 3
+      image: nginx:1.27
+
 - name: Register a job from its JSON document
   benemon.nomad.nomad_job:
     jobspec: "{{ lookup('ansible.builtin.file', 'web.json') }}"
@@ -112,7 +127,7 @@ from ansible_collections.benemon.nomad.plugins.module_utils.nomad import (
 )
 
 try:
-    from nomadpy import QueryOptions
+    from nomadpy import JobSubmission, QueryOptions
 except ImportError:
     pass
 
@@ -150,18 +165,35 @@ def wait_for_deployment(module, client, job_id, deadline):
     module.fail_json(msg="deployment %s did not finish within %d seconds" % (dep.id, module.params["timeout"]), deployment=dep.to_json())
 
 
-def document(module, client, jobspec):
+def hcl_value(module, name, value):
+    if isinstance(value, bool):
+        return str(value).lower()
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, str):
+        return json.dumps(value)
+    if isinstance(value, list) and not any(isinstance(v, (dict, list)) for v in value):
+        return "[" + ", ".join(hcl_value(module, name, v) for v in value) + "]"
+    module.fail_json(msg="hcl_variables.%s must be a string, number, boolean or a list of those" % name)
+
+
+def document(module, client, jobspec, variables):
+    """document returns the job document and, for HCL input, the submission that records its source."""
     if isinstance(jobspec, dict):
-        return jobspec
-    if not isinstance(jobspec, str):
+        doc = jobspec
+    elif not isinstance(jobspec, str):
         module.fail_json(msg="jobspec must be HCL text, a JSON document as text, or the document itself")
-    try:
-        doc = json.loads(jobspec)
-    except ValueError:
-        return client.jobs.parse_hcl(jobspec).to_json()
-    if not isinstance(doc, dict):
-        module.fail_json(msg="jobspec is JSON but not a job document")
-    return doc
+    else:
+        try:
+            doc = json.loads(jobspec)
+        except ValueError:
+            hcl = "\n".join("%s = %s" % (name, hcl_value(module, name, value)) for name, value in (variables or {}).items())
+            return client.jobs.parse_hcl(jobspec, variables=hcl).to_json(), JobSubmission(source=jobspec, format="hcl2", variables=hcl)
+        if not isinstance(doc, dict):
+            module.fail_json(msg="jobspec is JSON but not a job document")
+    if variables:
+        module.fail_json(msg="hcl_variables is set but jobspec is a document, not HCL")
+    return doc, None
 
 
 def main():
@@ -170,6 +202,7 @@ def main():
             NOMAD_ARGUMENT_SPEC,
             **NOMAD_NAMESPACE_ARGUMENT_SPEC,
             jobspec=dict(type="raw"),
+            hcl_variables=dict(type="dict"),
             name=dict(type="str"),
             state=dict(type="str", choices=["present", "absent"], default="present"),
             purge=dict(type="bool", default=False),
@@ -196,13 +229,17 @@ def main():
                 wait_for_eval(module, client, eval_id, deadline)
             module.exit_json(changed=True, eval_id=eval_id, diff=diff)
 
-        job = document(module, client, p["jobspec"])
+        job, submission = document(module, client, p["jobspec"], p["hcl_variables"])
         job_id = job.get("ID")
         if not job_id:
             module.fail_json(msg="the job specification has no ID")
         for option, key in (("name", "ID"), ("namespace", "Namespace"), ("region", "Region")):
             if p[option] and job.get(key):
                 module.fail_json(msg="%s is set on the module and %s in the job specification; set one of them" % (option, key))
+        if job.get("Namespace"):
+            client.set_namespace(job["Namespace"])
+        if job.get("Region"):
+            client.set_region(job["Region"])
 
         current = read_or_none(lambda: client.jobs.info(job_id))
         plan = client.jobs.plan(job, diff=True, policy_override=p["policy_override"])[0]
@@ -211,7 +248,7 @@ def main():
         if not changed or module.check_mode:
             module.exit_json(job=current.to_json() if current else job, **result)
 
-        resp = client.jobs.register(job, policy_override=p["policy_override"])[0]
+        resp = client.jobs.register(job, policy_override=p["policy_override"], submission=submission)[0]
         result["eval_id"] = resp.eval_id
         if p["wait"]:
             wait_for_eval(module, client, resp.eval_id, deadline)
