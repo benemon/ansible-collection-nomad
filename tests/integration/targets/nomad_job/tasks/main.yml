@@ -81,11 +81,18 @@
           - info.jobs[0].TaskGroups[0].Count == 2
           - listed.jobs | map(attribute='ID') | list == ['web']
 
-    - name: A name that does not match the specification fails
+    - name: A name beside a specification fails, whatever its value
       benemon.nomad.nomad_job:
-        name: other
+        name: web
         jobspec: "{{ web_hcl }}"
       register: mismatch
+      ignore_errors: true
+
+    - name: A namespace beside a specification that names one fails
+      benemon.nomad.nomad_job:
+        namespace: default
+        jobspec: "{{ web_hcl | replace('type        = \"service\"', 'type = \"service\"\n  namespace = \"default\"') }}"
+      register: ns_conflict
       ignore_errors: true
 
     - name: Stop the job
@@ -118,6 +125,9 @@
     - ansible.builtin.assert:
         that:
           - mismatch is failed
+          - "'set one of them' in mismatch.msg"
+          - ns_conflict is failed
+          - "'Namespace' in ns_conflict.msg"
           - stopped is changed
           - stopped.diff.before.ID == 'web'
           - stopped_again is not changed

@@ -86,9 +86,14 @@ def test_no_wait(run):
     c.evaluations.info.assert_not_called()
 
 
-def test_name_must_match(run):
-    with pytest.raises(Fail):
-        run(nomad_job, dict(jobspec=SPEC, name="other"), client())
+def test_one_source_for_identity(run):
+    with pytest.raises(Fail, match="name is set on the module and ID in the job specification"):
+        run(nomad_job, dict(jobspec=SPEC, name="web"), client())
+    with pytest.raises(Fail, match="namespace is set on the module and Namespace"):
+        run(nomad_job, dict(jobspec=dict(SPEC, Namespace="web"), namespace="web"), client())
+    with pytest.raises(Fail, match="region is set on the module and Region"):
+        run(nomad_job, dict(jobspec=dict(SPEC, Region="global"), region="global"), client())
+    assert run(nomad_job, dict(jobspec=dict(SPEC, Namespace=""), namespace="web"), client())["changed"] is True
 
 
 def test_absent(run):
