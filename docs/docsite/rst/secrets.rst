@@ -69,19 +69,28 @@ arguments and falls back to the same environment variables; it does not see
 ACL tokens
 ----------
 
-The Nomad API returns a token's ``SecretID`` in every full token document.
-:ansplugin:`benemon.nomad.nomad_acl_token#module` returns it once: the
-:ansretval:`benemon.nomad.nomad_acl_token#module:token` of the task that creates
-a token carries ``SecretID``, and every other result, including an unchanged
-run against the same token and every result of
-:ansplugin:`benemon.nomad.nomad_acl_token_info#module`, leaves it out.
+.. warning::
 
-Register the creating task and set ``no_log`` on it to capture the secret
-without printing it:
+   The Nomad API returns a token's ``SecretID`` in every full token document,
+   and the modules pass it on unchanged: the
+   :ansretval:`benemon.nomad.nomad_acl_token#module:token` of every
+   :ansplugin:`benemon.nomad.nomad_acl_token#module` run, and the
+   :ansretval:`benemon.nomad.nomad_acl_token_info#module:tokens` of a
+   :ansplugin:`benemon.nomad.nomad_acl_token_info#module` run that selects a
+   token by accessor ID or name. Every such result is a secret: it appears in
+   the task's output, in verbose logs, in callback plugins and in a registered
+   variable. Set ``no_log`` on these tasks and register their results only
+   when a later task needs the secret.
+
+Diffs never carry the ``SecretID``, and a listing without a selector returns
+the API's stubs, which carry no secret.
+
+Because the secret comes back on every run, a play that stores it can
+converge on any run rather than only on the one that created the token:
 
 .. code-block:: yaml
 
-   - name: Create a client token and keep its secret out of the log
+   - name: Ensure the CI reader token exists
      benemon.nomad.nomad_acl_token:
        name: ci-reader
        type: client
@@ -95,8 +104,3 @@ without printing it:
        path: ci/reader-token
        items:
          secret: "{{ token.token.SecretID }}"
-     when: token is changed
-
-On a later run the token already exists, the task reports no change and
-``token.token`` has no ``SecretID``; the ``when`` above keeps the second task
-from writing an undefined value.
