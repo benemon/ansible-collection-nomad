@@ -14,6 +14,11 @@ First release of the ``benemon.nomad`` collection: modules and ``_info`` twins f
 nodes, variables, ACL policies, roles and tokens, quotas and Sentinel policies, and a lookup for variables,
 all over the Nomad HTTP API through nomadpy.
 
+Minor Changes
+-------------
+
+- Added end-to-end example playbooks under ``examples/`` and an Examples guide page that walks them.
+
 New Plugins
 -----------
 
