@@ -62,6 +62,14 @@
         name: web
       register: info
 
+    - name: The HCL source was kept as the job's submission
+      ansible.builtin.uri:
+        url: "{{ nomad_address }}/v1/job/web/submission?version={{ info.jobs[0].Version }}"
+        headers:
+          X-Nomad-Token: "{{ nomad_token }}"
+        return_content: true
+      register: submission
+
     - name: List jobs
       benemon.nomad.nomad_job_info:
       register: listed
@@ -79,6 +87,8 @@
           - scaled.deployment.Status == 'successful'
           - scaled_again is not changed
           - info.jobs[0].TaskGroups[0].Count == 2
+          - submission.json.Format == 'hcl2'
+          - "'job \"web\"' in submission.json.Source"
           - listed.jobs | map(attribute='ID') | list == ['web']
 
     - name: A name beside a specification fails, whatever its value
@@ -86,6 +96,50 @@
         name: web
         jobspec: "{{ web_hcl }}"
       register: mismatch
+      ignore_errors: true
+
+    - name: A specification that names its namespace is read and planned there
+      benemon.nomad.nomad_job:
+        jobspec: "{{ web_hcl | replace('type        = \"service\"', 'type = \"service\"\n  namespace = \"default\"') }}"
+      register: ns_in_spec
+
+    - name: Variables declared in HCL are supplied through hcl_variables
+      benemon.nomad.nomad_job:
+        jobspec: |
+          variable "count" {}
+          variable "sleep" { default = "600" }
+          job "web" {
+            datacenters = ["dc1"]
+            type        = "service"
+            group "g" {
+              count = var.count
+              update {
+                min_healthy_time = "1s"
+                healthy_deadline = "30s"
+              }
+              task "t" {
+                driver = "raw_exec"
+                config {
+                  command = "/bin/sh"
+                  args    = ["-c", "sleep ${var.sleep}"]
+                }
+                resources {
+                  cpu    = 10
+                  memory = 32
+                }
+              }
+            }
+          }
+        hcl_variables:
+          count: 2
+      register: with_vars
+
+    - name: hcl_variables beside a document fails
+      benemon.nomad.nomad_job:
+        jobspec: "{{ checked.diff.after }}"
+        hcl_variables:
+          count: 2
+      register: vars_conflict
       ignore_errors: true
 
     - name: A namespace beside a specification that names one fails
@@ -126,6 +180,12 @@
         that:
           - mismatch is failed
           - "'set one of them' in mismatch.msg"
+          - ns_in_spec is not failed
+          - ns_in_spec.job.Namespace == 'default'
+          - with_vars is not failed
+          - with_vars.job.TaskGroups[0].Count == 2
+          - vars_conflict is failed
+          - "'not HCL' in vars_conflict.msg"
           - ns_conflict is failed
           - "'Namespace' in ns_conflict.msg"
           - stopped is changed

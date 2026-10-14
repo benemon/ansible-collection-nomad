@@ -1,7 +1,7 @@
 from unittest import mock
 
 import pytest
-from nomadpy import Deployment, Evaluation, Job, JobDiff, JobPlanResponse, JobRegisterResponse, QueryMeta, UnexpectedResponseError, WriteMeta
+from nomadpy import Deployment, Evaluation, Job, JobDiff, JobPlanResponse, JobRegisterResponse, JobSubmission, QueryMeta, UnexpectedResponseError, WriteMeta
 
 import json
 
@@ -32,15 +32,38 @@ def test_register_and_wait(run):
     result = run(nomad_job, dict(jobspec=SPEC), c)
     assert result["changed"] is True and result["eval_id"] == "ev1" and result["deployment"]["Status"] == "successful"
     assert result["job"]["Status"] == "running"
-    c.jobs.register.assert_called_once_with(SPEC, policy_override=False)
+    c.jobs.register.assert_called_once_with(SPEC, policy_override=False, submission=None)
 
 
 def test_hcl_is_parsed_by_the_server(run):
     c = client()
     c.jobs.parse_hcl.return_value = Job(id="web", type="service")
     run(nomad_job, dict(jobspec='job "web" {}'), c)
-    c.jobs.parse_hcl.assert_called_once_with('job "web" {}')
+    c.jobs.parse_hcl.assert_called_once_with('job "web" {}', variables="")
+    assert c.jobs.register.call_args.kwargs["submission"] == JobSubmission(source='job "web" {}', format="hcl2", variables="")
     assert c.jobs.register.call_args.args[0]["ID"] == "web"
+
+
+def test_hcl_variables_reach_the_parser(run):
+    c = client()
+    c.jobs.parse_hcl.return_value = Job(id="web", type="service")
+    run(nomad_job, dict(jobspec='job "web" {}', hcl_variables=dict(count=3, image="nginx:1.27", debug=False, tags=["a", "b"])), c)
+    assert c.jobs.parse_hcl.call_args.kwargs["variables"] == 'count = 3\nimage = "nginx:1.27"\ndebug = false\ntags = ["a", "b"]'
+    assert c.jobs.register.call_args.kwargs["submission"].variables == c.jobs.parse_hcl.call_args.kwargs["variables"]
+    with pytest.raises(Fail, match="jobspec is a document, not HCL"):
+        run(nomad_job, dict(jobspec=SPEC, hcl_variables=dict(count=3)), client())
+    with pytest.raises(Fail, match="must be a string, number, boolean or a list"):
+        run(nomad_job, dict(jobspec='job "web" {}', hcl_variables=dict(meta=dict(a=1))), c)
+
+
+def test_namespace_in_the_specification_is_used_for_reads(run):
+    c = client()
+    run(nomad_job, dict(jobspec=dict(SPEC, Namespace="web", Region="eu")), c)
+    c.set_namespace.assert_called_once_with("web")
+    c.set_region.assert_called_once_with("eu")
+    c = client(RUNNING, diff_type="None")
+    run(nomad_job, dict(jobspec=SPEC), c)
+    c.set_namespace.assert_not_called()
 
 
 def test_json_text_is_the_document(run):

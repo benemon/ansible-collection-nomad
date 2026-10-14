@@ -16,7 +16,9 @@ one of three forms. The module decides which by looking at the value.
 
 HCL text
    A string that is not JSON is sent to the server's parse endpoint and
-   converted there. The `job specification <https://developer.hashicorp.com/nomad/docs/job-specification>`_
+   converted there, and the registration carries the source as the job's
+   submission, so the cluster keeps the specification as written and the
+   UI shows it beside the canonical document. The `job specification <https://developer.hashicorp.com/nomad/docs/job-specification>`_
    must be valid for the server's version; no HCL is parsed on the controller.
 
    .. code-block:: yaml
@@ -76,6 +78,28 @@ module or in the specification, and the task fails when both carry one. Nothing
 is overridden and nothing is ignored. A document read back from the API carries
 all three, so a round trip is registered without those options; a specification
 meant to be registered under several names or namespaces is a template.
+
+HCL variables
+-------------
+
+An HCL specification may declare ``variable`` blocks and use them as
+``var.name``. Values for them go in
+:ansopt:`benemon.nomad.nomad_job#module:hcl_variables`, which the module
+passes to the server's parse endpoint; a variable with no default must be
+supplied there. The option is for HCL input only, and the task fails when it
+is given with a document, so a value is never silently ignored.
+
+.. code-block:: yaml
+
+   - name: Register a specification that declares variables
+     benemon.nomad.nomad_job:
+       jobspec: "{{ lookup('ansible.builtin.file', 'web.nomad.hcl') }}"
+       hcl_variables:
+         count: 3
+         image: nginx:1.27
+
+Values are strings, numbers, booleans or lists of those. A specification
+that needs more structure than that is a template.
 
 Change detection and diff
 -------------------------
