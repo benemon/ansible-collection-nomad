@@ -39,6 +39,7 @@ jobs:
       # The oldest ansible-core the collection claims on its oldest Python, and the newest of both; one job per lane.
       matrix:
         lane: [community, enterprise]
+        ansible-core: ["2.19.*", "2.21.*"]
         include:
           - ansible-core: "2.19.*"
             python-version: "3.11"
