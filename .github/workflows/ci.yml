@@ -16,19 +16,37 @@ env:
   NOMAD_VERSION: "2.0.5"
 
 jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ansible_collections/benemon/nomad
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: ansible_collections/benemon/nomad
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - run: python -m pip install "ansible-core==2.21.*" -r requirements.txt
+      - run: ansible-test sanity --python 3.13 --requirements
+
   test:
+    name: test (${{ matrix.ansible-core }}, ${{ matrix.python-version }}, ${{ matrix.lane }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      # The oldest ansible-core the collection claims on its oldest Python, and the newest of both.
+      # The oldest ansible-core the collection claims on its oldest Python, and the newest of both; one job per lane.
       matrix:
+        lane: [community, enterprise]
+        ansible-core: ["2.19.*", "2.21.*"]
         include:
           - ansible-core: "2.19.*"
             python-version: "3.11"
           - ansible-core: "2.21.*"
             python-version: "3.13"
     env:
-      NOMAD_LICENSE: ${{ secrets.NOMAD_LICENCE }}
+      NOMAD_LICENSE: ${{ matrix.lane == 'enterprise' && secrets.NOMAD_LICENCE || '' }}
     defaults:
       run:
         working-directory: ansible_collections/benemon/nomad
@@ -39,32 +57,35 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Nomad Community and Enterprise
+      - name: Install Nomad
         run: |
           set -euo pipefail
-          for edition in "" "+ent"; do
-            v="${NOMAD_VERSION}${edition}"
-            z="nomad_${v}_linux_amd64.zip"
-            curl -sfLO "https://releases.hashicorp.com/nomad/${v}/${z}"
-            curl -sfLO "https://releases.hashicorp.com/nomad/${v}/nomad_${v}_SHA256SUMS"
-            grep "${z}" "nomad_${v}_SHA256SUMS" | sha256sum -c -
-            mkdir -p "$HOME/nomad${edition}"
-            unzip -oq "${z}" nomad -d "$HOME/nomad${edition}"
-            rm -f "${z}" "nomad_${v}_SHA256SUMS"
-          done
-          echo "NOMADPY_TEST_CE_BIN=$HOME/nomad/nomad" >> "$GITHUB_ENV"
-          echo "NOMADPY_TEST_ENT_BIN=$HOME/nomad+ent/nomad" >> "$GITHUB_ENV"
+          edition=""
+          [ "${{ matrix.lane }}" = enterprise ] && edition="+ent"
+          v="${NOMAD_VERSION}${edition}"
+          z="nomad_${v}_linux_amd64.zip"
+          curl -sfLO "https://releases.hashicorp.com/nomad/${v}/${z}"
+          curl -sfLO "https://releases.hashicorp.com/nomad/${v}/nomad_${v}_SHA256SUMS"
+          grep "${z}" "nomad_${v}_SHA256SUMS" | sha256sum -c -
+          mkdir -p "$HOME/nomad"
+          unzip -oq "${z}" nomad -d "$HOME/nomad"
+          rm -f "${z}" "nomad_${v}_SHA256SUMS"
+          if [ -n "$edition" ]; then
+            echo "NOMADPY_TEST_ENT_BIN=$HOME/nomad/nomad" >> "$GITHUB_ENV"
+          else
+            echo "NOMADPY_TEST_CE_BIN=$HOME/nomad/nomad" >> "$GITHUB_ENV"
+          fi
       - name: Write the Enterprise licence
-        if: ${{ env.NOMAD_LICENSE != '' }}
+        if: ${{ matrix.lane == 'enterprise' && env.NOMAD_LICENSE != '' }}
         run: |
           umask 077
           printf '%s\n' "$NOMAD_LICENSE" > "$HOME/nomad.hclic"
           echo "NOMAD_LICENSE_PATH=$HOME/nomad.hclic" >> "$GITHUB_ENV"
       - name: Install
         run: python -m pip install "ansible-core==${{ matrix.ansible-core }}" -r requirements.txt
-      - name: Sanity
-        run: ansible-test sanity --python ${{ matrix.python-version }} --requirements
       - name: Units
         run: ansible-test units --python ${{ matrix.python-version }} --requirements
       - name: Integration
+        # The Enterprise lane needs the licence secret, which a fork does not have; the lane is then skipped, not failed.
+        if: ${{ matrix.lane == 'community' || env.NOMAD_LICENSE != '' }}
         run: python tests/integration/run.py --python ${{ matrix.python-version }}
