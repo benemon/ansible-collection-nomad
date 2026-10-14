@@ -44,8 +44,10 @@ options:
     choices: [present, absent]
     default: present
 notes:
-  - The C(SecretID) is returned only by the task that creates the token. Later runs, including unchanged ones, never return it.
-    Set C(no_log) on the creating task and register its result to capture the secret.
+  - The returned token carries its C(SecretID) whenever the API returns one, which is on every run that reads the token
+    in full. Treat every result of this module as a secret. Set C(no_log) on the task, and register the result only when
+    a later task needs the secret.
+  - The diff never carries the C(SecretID).
 extends_documentation_fragment:
   - benemon.nomad.nomad
 author:
@@ -77,8 +79,7 @@ EXAMPLES = r"""
 RETURN = r"""
 token:
   description:
-    - The token as the Nomad API returns it, with the API's field names.
-    - C(SecretID) is present only when this task created the token; every other result leaves it out.
+    - The token as the Nomad API returns it, with the API's field names, C(SecretID) included.
   returned: when O(state=present)
   type: dict
   sample:
@@ -117,6 +118,7 @@ except ImportError:
 
 
 def redacted(token):
+    """redacted is the token for a diff, which is display and never carries the secret."""
     doc = token.to_json()
     del doc["SecretID"]
     return doc
@@ -171,12 +173,12 @@ def main():
         ))
         changed = current is None or differs(current, wanted)
         if not changed or module.check_mode:
-            module.exit_json(changed=changed, token=redacted(wanted), diff=dict(before=before, after=redacted(wanted)))
+            module.exit_json(changed=changed, token=wanted.to_json(), diff=dict(before=before, after=redacted(wanted)))
         if current is None:
             created = client.acl_tokens.create(wanted)[0]
             module.exit_json(changed=True, token=created.to_json(), diff=dict(before={}, after=redacted(created)))
         updated = client.acl_tokens.update(wanted)[0]
-        module.exit_json(changed=True, token=redacted(updated), diff=dict(before=before, after=redacted(updated)))
+        module.exit_json(changed=True, token=updated.to_json(), diff=dict(before=before, after=redacted(updated)))
 
 
 if __name__ == "__main__":

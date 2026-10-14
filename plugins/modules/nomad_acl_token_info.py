@@ -9,7 +9,8 @@ short_description: Read Nomad ACL tokens
 version_added: 0.1.0
 description:
   - Return the tokens the token can see, optionally narrowed to one accessor ID or name.
-  - Secrets are never returned. Use M(benemon.nomad.nomad_acl_token) to create a token and capture its secret.
+  - A token selected by O(accessor_id) or O(name) is returned in full, C(SecretID) included, as the API returns it.
+    Without a selector the list endpoint's stubs are returned, which carry no secret.
 options:
   accessor_id:
     description: Accessor ID of a single token to return. A token that does not exist returns an empty list.
@@ -17,6 +18,9 @@ options:
   name:
     description: Name of the tokens to return. Nomad does not keep names unique, so more than one may match.
     type: str
+notes:
+  - A result for a selected token is a secret. Set C(no_log) on the task, and register the result only when a later task
+    needs the secret.
 extends_documentation_fragment:
   - benemon.nomad.nomad
 author:
@@ -28,17 +32,19 @@ EXAMPLES = r"""
   benemon.nomad.nomad_acl_token_info:
   register: result
 
-- name: Find the tokens named ci-reader
+- name: Read the token named ci-reader, secret included
   benemon.nomad.nomad_acl_token_info:
     name: ci-reader
   register: result
+  no_log: true
 """
 
 RETURN = r"""
 tokens:
   description:
-    - Tokens as the Nomad API's list endpoint returns them, with the API's field names.
-    - These are the list endpoint's stubs, which carry no C(SecretID) or C(ExpirationTTL) and name roles by ID only.
+    - Tokens as the Nomad API returns them, with the API's field names.
+    - With O(accessor_id) or O(name), the full token documents, C(SecretID) included.
+    - Without a selector, the list endpoint's stubs, which carry no C(SecretID) or C(ExpirationTTL) and name roles by ID only.
   returned: always
   type: list
   elements: dict
@@ -59,7 +65,7 @@ tokens:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.benemon.nomad.plugins.module_utils.nomad import NOMAD_ARGUMENT_SPEC, nomad_client, nomad_errors
+from ansible_collections.benemon.nomad.plugins.module_utils.nomad import NOMAD_ARGUMENT_SPEC, nomad_client, nomad_errors, read_or_none
 
 
 def main():
@@ -71,11 +77,13 @@ def main():
     p = module.params
     client = nomad_client(module)
     with nomad_errors(module):
-        tokens = client.acl_tokens.list()[0]
-    if p["accessor_id"]:
-        tokens = [t for t in tokens if t.accessor_id == p["accessor_id"]]
-    elif p["name"]:
-        tokens = [t for t in tokens if t.name == p["name"]]
+        if p["accessor_id"]:
+            token = read_or_none(lambda: client.acl_tokens.info(p["accessor_id"]))
+            tokens = [token] if token else []
+        elif p["name"]:
+            tokens = [client.acl_tokens.info(t.accessor_id)[0] for t in client.acl_tokens.list()[0] if t.name == p["name"]]
+        else:
+            tokens = client.acl_tokens.list()[0]
     module.exit_json(changed=False, tokens=[t.to_json() for t in tokens])
 
 
