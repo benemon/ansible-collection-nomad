@@ -1,0 +1,74 @@
+- name: Onboard a team onto its own namespace
+  hosts: localhost
+  gather_facts: false
+  vars:
+    prefix: example
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address | default(omit) }}"
+      token: "{{ nomad_token | default(omit) }}"
+  tasks:
+    - name: Create the namespace
+      benemon.nomad.nomad_namespace:
+        name: "{{ prefix }}-web"
+        description: Web tier
+        capabilities:
+          enabled_task_drivers: [docker, exec]
+
+    - name: Create a policy that writes to the namespace only
+      benemon.nomad.nomad_acl_policy:
+        name: "{{ prefix }}-web-deploy"
+        description: Deploy to the web tier
+        rules: |
+          namespace "{{ prefix }}-web" {
+            policy = "write"
+          }
+
+    - name: Create a role that grants the policy
+      benemon.nomad.nomad_acl_role:
+        name: "{{ prefix }}-web-deployers"
+        policies: ["{{ prefix }}-web-deploy"]
+
+    - name: Create the team's deployment token
+      benemon.nomad.nomad_acl_token:
+        name: "{{ prefix }}-web-deployer"
+        type: client
+        roles: ["{{ prefix }}-web-deployers"]
+      register: token
+      no_log: true
+
+    - name: Store the token where the team's pipeline reads it
+      benemon.nomad.nomad_variable:
+        path: ci/deployer-token
+        namespace: "{{ prefix }}-web"
+        items:
+          secret: "{{ token.token.SecretID }}"
+
+    - name: Remove everything the play created
+      tags: [cleanup]
+      block:
+        - name: Delete the variable
+          benemon.nomad.nomad_variable:
+            path: ci/deployer-token
+            namespace: "{{ prefix }}-web"
+            state: absent
+
+        - name: Delete the token
+          benemon.nomad.nomad_acl_token:
+            name: "{{ prefix }}-web-deployer"
+            state: absent
+
+        - name: Delete the role
+          benemon.nomad.nomad_acl_role:
+            name: "{{ prefix }}-web-deployers"
+            state: absent
+
+        - name: Delete the policy
+          benemon.nomad.nomad_acl_policy:
+            name: "{{ prefix }}-web-deploy"
+            state: absent
+
+        - name: Delete the namespace
+          benemon.nomad.nomad_namespace:
+            name: "{{ prefix }}-web"
+            state: absent
