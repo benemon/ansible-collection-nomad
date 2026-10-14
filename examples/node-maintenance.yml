@@ -19,7 +19,7 @@
         name: "{{ node_name }}"
         drain: true
         ignore_system_jobs: true
-        deadline: 5m
+        deadline: 1m
 
     - name: Maintain the node
       ansible.builtin.debug:
