@@ -6,4 +6,5 @@ sections:
       - jobs
       - secrets
       - enterprise
+      - examples
       - contributing
