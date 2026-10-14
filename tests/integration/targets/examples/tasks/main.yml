@@ -1,0 +1,51 @@
+- name: Run the example playbooks from the collection tree against the lane
+  vars:
+    # ansible-test runs the role from a copy of tests/integration, so the tree is found through the path it exports.
+    collections_path: "{{ lookup('ansible.builtin.env', 'ANSIBLE_COLLECTIONS_PATH') }}"
+    examples: "{{ collections_path }}/ansible_collections/benemon/nomad/examples"
+    # Each playbook runs twice. One whose middle is idempotent keeps its resources on the first run so the second
+    # run reports only its cleanup; the others report the same changes on both runs.
+    runs:
+      - name: namespace-onboarding
+        keep: true
+        changed: 5
+      - name: deploy-job
+        keep: false
+        changed: 3
+      - name: node-maintenance
+        keep: false
+        changed: 2
+      - name: secrets-rotation
+        keep: false
+        changed: 5
+      - name: enterprise-governance
+        keep: true
+        changed: "{{ 5 if nomad_enterprise else 0 }}"
+  environment:
+    ANSIBLE_COLLECTIONS_PATH: "{{ collections_path }}"
+    NOMAD_TOKEN: "{{ nomad_token }}"
+  block:
+    - name: First run
+      ansible.builtin.command:
+        cmd: ansible-playbook {{ item.name }}.yml -e nomad_address={{ nomad_address }} -e prefix=ci {{ '--skip-tags cleanup' if item.keep else '' }}
+        chdir: "{{ examples }}"
+      loop: "{{ runs }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Second run
+      ansible.builtin.command:
+        cmd: ansible-playbook {{ item.name }}.yml -e nomad_address={{ nomad_address }} -e prefix=ci
+        chdir: "{{ examples }}"
+      loop: "{{ runs }}"
+      loop_control:
+        label: "{{ item.name }}"
+      register: second
+
+    - name: The second run's recap shows the expected changes
+      ansible.builtin.assert:
+        that: item.stdout | regex_search('changed=(\\d+)', '\\1') | first | int == item.item.changed | int
+        fail_msg: "{{ item.item.name }}: {{ item.stdout_lines | last }}"
+      loop: "{{ second.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"

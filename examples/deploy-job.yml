@@ -1,0 +1,39 @@
+- name: Deploy a service job from a template
+  hosts: localhost
+  gather_facts: false
+  vars:
+    prefix: example
+    driver: raw_exec
+    sleep_seconds: 600
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address | default(omit) }}"
+      token: "{{ nomad_token | default(omit) }}"
+  tasks:
+    - name: Register the job and wait for its deployment
+      benemon.nomad.nomad_job:
+        jobspec: "{{ lookup('ansible.builtin.template', 'templates/web.nomad.hcl.j2') }}"
+      vars:
+        count: 1
+
+    - name: Read the job back
+      benemon.nomad.nomad_job_info:
+        name: "{{ prefix }}-web"
+      register: web
+
+    - name: Report what the server holds
+      ansible.builtin.debug:
+        msg: "{{ web.jobs[0].ID }} is {{ web.jobs[0].Status }} with {{ web.jobs[0].TaskGroups[0].Count }} instance(s)"
+
+    - name: Scale the job by registering it with one more instance
+      benemon.nomad.nomad_job:
+        jobspec: "{{ lookup('ansible.builtin.template', 'templates/web.nomad.hcl.j2') }}"
+      vars:
+        count: 2
+
+    - name: Stop the job and remove it from the server
+      benemon.nomad.nomad_job:
+        name: "{{ prefix }}-web"
+        state: absent
+        purge: true
+      tags: [cleanup]
