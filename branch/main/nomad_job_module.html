@@ -176,7 +176,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <li><p>Register a job from its specification, or stop it.</p></li>
 <li><p>Whether a registration changes anything is decided by the server’s plan endpoint, so an unchanged job reports no change.</p></li>
 <li><p>The diff shows the job on the server before and the submitted document after.</p></li>
-<li><p>A value is given in one place only. <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-job-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-job-module-parameter-namespace"><span class="std std-ref"><span class="pre">namespace</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-job-module-parameter-region"><span class="std std-ref"><span class="pre">region</span></span></a></strong></code> fail the task when the specification also carries <code class="docutils literal notranslate"><span class="pre">ID</span></code>, <code class="docutils literal notranslate"><span class="pre">Namespace</span></code> or <code class="docutils literal notranslate"><span class="pre">Region</span></code>; nothing is overridden and nothing is ignored. A document read back from the API carries all three, so it is registered without those options.</p></li>
+<li><p>A value is given in one place only. <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-job-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-job-module-parameter-namespace"><span class="std std-ref"><span class="pre">namespace</span></span></a></strong></code> and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-job-module-parameter-region"><span class="std std-ref"><span class="pre">region</span></span></a></strong></code> fail the task when the specification also carries <code class="docutils literal notranslate"><span class="pre">ID</span></code>, <code class="docutils literal notranslate"><span class="pre">Namespace</span></code> or <code class="docutils literal notranslate"><span class="pre">Region</span></code>; nothing is overridden and nothing is ignored. A document read back from the API carries all three, so it is registered without those options. A <code class="docutils literal notranslate"><span class="pre">Namespace</span></code> or <code class="docutils literal notranslate"><span class="pre">Region</span></code> in the specification is the one the job is read and planned in.</p></li>
 <li><p>By default the module waits for the evaluation and, for service jobs, for the deployment to finish, and fails when allocations cannot be placed or the deployment fails.</p></li>
 </ul>
 </section>
@@ -237,15 +237,23 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-hcl_variables"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-hcl-variables"><strong>hcl_variables</strong></p>
+<a class="ansibleOptionLink" href="#parameter-hcl_variables" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Values for the <code class="docutils literal notranslate"><span class="pre">variable</span></code> blocks of an HCL specification, passed to the server’s parse endpoint.</p>
+<p>Only for HCL input; the task fails when <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-job-module-parameter-jobspec"><span class="std std-ref"><span class="pre">jobspec</span></span></a></strong></code> is a document. Values are strings, numbers, booleans or lists of those.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-jobspec"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-jobspec"><strong>jobspec</strong></p>
 <a class="ansibleOptionLink" href="#parameter-jobspec" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">any</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The job specification as HCL text, as a JSON document in text, or as the document itself.</p>
-<p>HCL is converted by the server, so it must be valid for the server’s version. The document is the shape <code class="docutils literal notranslate"><span class="pre">nomad</span> <span class="pre">job</span> <span class="pre">run</span> <span class="pre">-output</span></code> prints and the API documents.</p>
+<p>HCL is converted by the server, so it must be valid for the server’s version, and is registered with its source as the job’s submission, the record <code class="docutils literal notranslate"><span class="pre">nomad</span> <span class="pre">job</span> <span class="pre">run</span></code> keeps and the UI shows as the job spec. The document is the shape <code class="docutils literal notranslate"><span class="pre">nomad</span> <span class="pre">job</span> <span class="pre">run</span> <span class="pre">-output</span></code> prints and the API documents.</p>
 <p>Required when <code class="ansible-option-value docutils literal notranslate"><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-job-module-parameter-state"><span class="std std-ref"><span class="pre">state=present</span></span></a></code>.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-name"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-name"><strong>name</strong></p>
 <a class="ansibleOptionLink" href="#parameter-name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -253,7 +261,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <p>A specification carries its own ID, so <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-job-module-parameter-name"><span class="std std-ref"><span class="pre">name</span></span></a></strong></code> cannot be set with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-job-module-parameter-jobspec"><span class="std std-ref"><span class="pre">jobspec</span></span></a></strong></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-namespace"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-namespace"><strong>namespace</strong></p>
 <a class="ansibleOptionLink" href="#parameter-namespace" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -261,7 +269,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_NAMESPACE</span></code>, then <code class="ansible-value docutils literal notranslate"><span class="pre">default</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-policy_override"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-policy-override"><strong>policy_override</strong></p>
 <a class="ansibleOptionLink" href="#parameter-policy_override" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -273,7 +281,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-purge"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-purge"><strong>purge</strong></p>
 <a class="ansibleOptionLink" href="#parameter-purge" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -285,7 +293,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-region"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-region"><strong>region</strong></p>
 <a class="ansibleOptionLink" href="#parameter-region" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -293,7 +301,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_REGION</span></code>, then the region of the server answering.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-skip_verify"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-skip-verify"><strong>skip_verify</strong></p>
 <a class="ansibleOptionLink" href="#parameter-skip_verify" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -306,7 +314,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-state"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-state"><strong>state</strong></p>
 <a class="ansibleOptionLink" href="#parameter-state" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -318,7 +326,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-timeout"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-timeout"><strong>timeout</strong></p>
 <a class="ansibleOptionLink" href="#parameter-timeout" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -326,7 +334,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">300</span></code></p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-tls_server_name"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-tls-server-name"><strong>tls_server_name</strong></p>
 <a class="ansibleOptionLink" href="#parameter-tls_server_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -334,7 +342,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TLS_SERVER_NAME</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-token"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-token"><strong>token</strong></p>
 <a class="ansibleOptionLink" href="#parameter-token" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -342,7 +350,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TOKEN</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-wait"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-parameter-wait"><strong>wait</strong></p>
 <a class="ansibleOptionLink" href="#parameter-wait" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -378,6 +386,13 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <span class="w">  </span><span class="nt">benemon.nomad.nomad_job</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">jobspec</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">'ansible.builtin.template'</span><span class="o">,</span> <span class="s1">'web.nomad.hcl.j2'</span><span class="o">)</span> <span class="cp">}}</span><span class="s">"</span>
 <span class="w">    </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Register an HCL specification that declares variables</span>
+<span class="w">  </span><span class="nt">benemon.nomad.nomad_job</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">jobspec</span><span class="p">:</span><span class="w"> </span><span class="s">"</span><span class="cp">{{</span> <span class="nv">lookup</span><span class="o">(</span><span class="s1">'ansible.builtin.file'</span><span class="o">,</span> <span class="s1">'web.nomad.hcl'</span><span class="o">)</span> <span class="cp">}}</span><span class="s">"</span>
+<span class="w">    </span><span class="nt">hcl_variables</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx:1.27</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Register a job from its JSON document</span>
 <span class="w">  </span><span class="nt">benemon.nomad.nomad_job</span><span class="p">:</span>

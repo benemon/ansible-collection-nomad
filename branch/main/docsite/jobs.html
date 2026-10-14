@@ -76,6 +76,7 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Jobs</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#the-jobspec-option">The jobspec option</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hcl-variables">HCL variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#change-detection-and-diff">Change detection and diff</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#waiting">Waiting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stopping">Stopping</a></li>
@@ -151,7 +152,9 @@ back. Both are in the <code class="docutils literal notranslate"><span class="pr
 one of three forms. The module decides which by looking at the value.</p>
 <dl>
 <dt>HCL text</dt><dd><p>A string that is not JSON is sent to the server’s parse endpoint and
-converted there. The <a class="reference external" href="https://developer.hashicorp.com/nomad/docs/job-specification">job specification</a>
+converted there, and the registration carries the source as the job’s
+submission, so the cluster keeps the specification as written and the
+UI shows it beside the canonical document. The <a class="reference external" href="https://developer.hashicorp.com/nomad/docs/job-specification">job specification</a>
 must be valid for the server’s version; no HCL is parsed on the controller.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Register a job from an HCL file</span>
 <span class="w">  </span><span class="nt">benemon.nomad.nomad_job</span><span class="p">:</span>
@@ -207,6 +210,25 @@ module or in the specification, and the task fails when both carry one. Nothing
 is overridden and nothing is ignored. A document read back from the API carries
 all three, so a round trip is registered without those options; a specification
 meant to be registered under several names or namespaces is a template.</p>
+</section>
+<section id="hcl-variables">
+<h2>HCL variables<a class="headerlink" href="#hcl-variables" title="Link to this heading"></a></h2>
+<p>An HCL specification may declare <code class="docutils literal notranslate"><span class="pre">variable</span></code> blocks and use them as
+<code class="docutils literal notranslate"><span class="pre">var.name</span></code>. Values for them go in
+<code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="../nomad_job_module.html#ansible-collections-benemon-nomad-nomad-job-module-parameter-hcl-variables"><span class="std std-ref"><span class="pre">hcl_variables</span></span></a></strong></code>, which the module
+passes to the server’s parse endpoint; a variable with no default must be
+supplied there. The option is for HCL input only, and the task fails when it
+is given with a document, so a value is never silently ignored.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Register a specification that declares variables</span>
+<span class="w">  </span><span class="nt">benemon.nomad.nomad_job</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">jobspec</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">lookup('ansible.builtin.file',</span><span class="nv"> </span><span class="s">'web.nomad.hcl')</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">hcl_variables</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx:1.27</span>
+</pre></div>
+</div>
+<p>Values are strings, numbers, booleans or lists of those. A specification
+that needs more structure than that is a template.</p>
 </section>
 <section id="change-detection-and-diff">
 <h2>Change detection and diff<a class="headerlink" href="#change-detection-and-diff" title="Link to this heading"></a></h2>
