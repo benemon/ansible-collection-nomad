@@ -1,0 +1,32 @@
+- name: Take a client node out of service and bring it back
+  hosts: localhost
+  gather_facts: false
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address | default(omit) }}"
+      token: "{{ nomad_token | default(omit) }}"
+  tasks:
+    - name: List the client nodes
+      benemon.nomad.nomad_node_info:
+      register: nodes
+
+    - name: Pick the first ready node
+      ansible.builtin.set_fact:
+        node_name: "{{ (nodes.nodes | selectattr('Status', 'equalto', 'ready') | first).Name }}"
+
+    - name: Drain the node and wait for its allocations to move
+      benemon.nomad.nomad_node:
+        name: "{{ node_name }}"
+        drain: true
+        ignore_system_jobs: true
+        deadline: 5m
+
+    - name: Maintain the node
+      ansible.builtin.debug:
+        msg: "{{ node_name }} is drained; maintenance would run here"
+
+    - name: Stop the drain and let the scheduler use the node again
+      benemon.nomad.nomad_node:
+        name: "{{ node_name }}"
+        drain: false
+        mark_eligible: true

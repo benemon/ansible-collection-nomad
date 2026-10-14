@@ -1,0 +1,27 @@
+job "{{ prefix }}-web" {
+  datacenters = ["*"]
+  type        = "service"
+
+  group "web" {
+    count = {{ count }}
+
+    update {
+      min_healthy_time = "1s"
+      healthy_deadline = "30s"
+    }
+
+    task "web" {
+      driver = "{{ driver }}"
+
+      config {
+        command = "/bin/sh"
+        args    = ["-c", "sleep {{ sleep_seconds }}"]
+      }
+
+      resources {
+        cpu    = 10
+        memory = 32
+      }
+    }
+  }
+}

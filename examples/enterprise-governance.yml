@@ -1,0 +1,100 @@
+- name: Govern a namespace with a quota and a Sentinel policy
+  hosts: localhost
+  gather_facts: false
+  vars:
+    prefix: example
+    driver: raw_exec
+    nightly_job: |
+      job "{{ prefix }}-nightly" {
+        datacenters = ["*"]
+        type        = "batch"
+        priority    = 80
+
+        group "nightly" {
+          task "run" {
+            driver = "{{ driver }}"
+
+            config {
+              command = "/bin/sh"
+              args    = ["-c", "sleep 600"]
+            }
+
+            resources {
+              cpu    = 10
+              memory = 32
+            }
+          }
+        }
+      }
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address | default(omit) }}"
+      token: "{{ nomad_token | default(omit) }}"
+  tasks:
+    - name: Read the quota specifications, which only an Enterprise server serves
+      benemon.nomad.nomad_quota_info:
+      register: quotas
+      failed_when: quotas is failed and quotas.status_code != 501
+
+    - name: Apply governance on an Enterprise server
+      when: quotas.quotas is defined
+      block:
+        - name: Create a quota for the batch tier
+          benemon.nomad.nomad_quota:
+            name: "{{ prefix }}-batch"
+            description: Batch jobs
+            limits:
+              - region: global
+                region_limit:
+                  cpu: 500
+                  memory_mb: 256
+
+        - name: Create the namespace under the quota
+          benemon.nomad.nomad_namespace:
+            name: "{{ prefix }}-batch"
+            description: Batch jobs
+            quota: "{{ prefix }}-batch"
+
+        - name: Refuse high-priority jobs unless an operator overrides
+          benemon.nomad.nomad_sentinel_policy:
+            name: "{{ prefix }}-priority"
+            description: Jobs above priority 50 need an override
+            scope: submit-job
+            enforcement_level: soft-mandatory
+            policy: main = rule { job.priority <= 50 }
+
+        - name: Register a high-priority job with the override
+          benemon.nomad.nomad_job:
+            jobspec: "{{ nightly_job }}"
+            namespace: "{{ prefix }}-batch"
+            policy_override: true
+
+        - name: Remove everything the play created
+          tags: [cleanup]
+          block:
+            - name: Stop the job and remove it from the server
+              benemon.nomad.nomad_job:
+                name: "{{ prefix }}-nightly"
+                namespace: "{{ prefix }}-batch"
+                state: absent
+                purge: true
+
+            - name: Delete the Sentinel policy
+              benemon.nomad.nomad_sentinel_policy:
+                name: "{{ prefix }}-priority"
+                state: absent
+
+            - name: Detach the quota, which the server requires before the namespace can be deleted
+              benemon.nomad.nomad_namespace:
+                name: "{{ prefix }}-batch"
+                quota: ""
+
+            - name: Delete the namespace
+              benemon.nomad.nomad_namespace:
+                name: "{{ prefix }}-batch"
+                state: absent
+
+            - name: Delete the quota
+              benemon.nomad.nomad_quota:
+                name: "{{ prefix }}-batch"
+                state: absent
