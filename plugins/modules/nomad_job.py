@@ -11,6 +11,9 @@ description:
   - Register a job from its specification, or stop it.
   - Whether a registration changes anything is decided by the server's plan endpoint, so an unchanged job reports no change.
   - The diff shows the job on the server before and the submitted document after.
+  - A value is given in one place only. O(name), O(namespace) and O(region) fail the task when the specification
+    also carries C(ID), C(Namespace) or C(Region); nothing is overridden and nothing is ignored. A document read back
+    from the API carries all three, so it is registered without those options.
   - By default the module waits for the evaluation and, for service jobs, for the deployment to finish, and fails when
     allocations cannot be placed or the deployment fails.
 options:
@@ -23,8 +26,8 @@ options:
     type: raw
   name:
     description:
-      - The job ID.
-      - Required when O(state=absent). When set with O(jobspec) it must match the ID in the specification.
+      - The job ID, for O(state=absent).
+      - A specification carries its own ID, so O(name) cannot be set with O(jobspec).
     type: str
   state:
     description: Whether the job should be registered or stopped.
@@ -197,8 +200,9 @@ def main():
         job_id = job.get("ID")
         if not job_id:
             module.fail_json(msg="the job specification has no ID")
-        if p["name"] and p["name"] != job_id:
-            module.fail_json(msg="name is %s but the job specification's ID is %s" % (p["name"], job_id))
+        for option, key in (("name", "ID"), ("namespace", "Namespace"), ("region", "Region")):
+            if p[option] and job.get(key):
+                module.fail_json(msg="%s is set on the module and %s in the job specification; set one of them" % (option, key))
 
         current = read_or_none(lambda: client.jobs.info(job_id))
         plan = client.jobs.plan(job, diff=True, policy_override=p["policy_override"])[0]

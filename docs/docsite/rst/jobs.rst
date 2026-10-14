@@ -68,9 +68,14 @@ The document itself
                     Config:
                       image: nginx:1.27
 
-In every form the document must carry an ``ID``. :ansopt:`benemon.nomad.nomad_job#module:name`
-is optional with a specification; when set it must match that ID, and a mismatch
-fails the task.
+In every form the document must carry an ``ID``, so
+:ansopt:`benemon.nomad.nomad_job#module:name` is not set with a specification.
+The same rule holds for :ansopt:`benemon.nomad.nomad_job#module:namespace` and
+:ansopt:`benemon.nomad.nomad_job#module:region`: a value is given either on the
+module or in the specification, and the task fails when both carry one. Nothing
+is overridden and nothing is ignored. A document read back from the API carries
+all three, so a round trip is registered without those options; a specification
+meant to be registered under several names or namespaces is a template.
 
 Change detection and diff
 -------------------------
