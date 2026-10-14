@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_job
 short_description: Register or stop a Nomad job
+version_added: 0.1.0
 description:
   - Register a job from its specification, or stop it.
   - Whether a registration changes anything is decided by the server's plan endpoint, so an unchanged job reports no change.

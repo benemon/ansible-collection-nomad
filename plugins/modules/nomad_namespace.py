@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_namespace
 short_description: Manage a Nomad namespace
+version_added: 0.1.0
 description:
   - Create, update or delete a namespace.
   - Only the options that are set are compared and written; an option left out keeps its current value on the server.

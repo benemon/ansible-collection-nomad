@@ -1,0 +1,9 @@
+---
+edit_on_github:
+  repository: benemon/ansible-collection-nomad
+  branch: main
+  path_prefix: ''
+
+extra_links:
+  - description: Changelog
+    url: https://github.com/benemon/ansible-collection-nomad/blob/main/CHANGELOG.rst

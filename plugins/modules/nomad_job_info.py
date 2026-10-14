@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_job_info
 short_description: Read Nomad jobs
+version_added: 0.1.0
 description:
   - Return one job in full by ID, or the list of jobs in the namespace as the API's job list stubs.
 options:

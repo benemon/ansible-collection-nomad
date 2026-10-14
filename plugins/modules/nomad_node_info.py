@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_node_info
 short_description: Read Nomad client nodes
+version_added: 0.1.0
 description:
   - Return one node by ID or name, or every node the token can see.
 options:

@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_variable
 short_description: Manage a Nomad variable
+version_added: 0.1.0
 description:
   - Create, update or delete a variable at a path in a namespace.
   - The whole item set is compared and written; a key left out of O(items) is removed from the variable.

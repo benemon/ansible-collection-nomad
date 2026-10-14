@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_quota_info
 short_description: Read Nomad quota specifications
+version_added: 0.1.0
 description:
   - Return one quota specification by name, or every quota specification the token can see. Enterprise.
 options:

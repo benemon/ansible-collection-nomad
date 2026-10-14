@@ -1,0 +1,82 @@
+ancestor: null
+releases:
+  0.1.0:
+    changes:
+      release_summary: 'First release of the ``benemon.nomad`` collection: modules
+        and ``_info`` twins for jobs, namespaces, node pools,
+
+        nodes, variables, ACL policies, roles and tokens, quotas and Sentinel policies,
+        and a lookup for variables,
+
+        all over the Nomad HTTP API through nomadpy.
+
+        '
+    fragments:
+    - 0.1.0.yml
+    modules:
+    - description: Manage a Nomad ACL policy.
+      name: nomad_acl_policy
+      namespace: ''
+    - description: Read Nomad ACL policies.
+      name: nomad_acl_policy_info
+      namespace: ''
+    - description: Manage a Nomad ACL role.
+      name: nomad_acl_role
+      namespace: ''
+    - description: Read Nomad ACL roles.
+      name: nomad_acl_role_info
+      namespace: ''
+    - description: Manage a Nomad ACL token.
+      name: nomad_acl_token
+      namespace: ''
+    - description: Read Nomad ACL tokens.
+      name: nomad_acl_token_info
+      namespace: ''
+    - description: Register or stop a Nomad job.
+      name: nomad_job
+      namespace: ''
+    - description: Read Nomad jobs.
+      name: nomad_job_info
+      namespace: ''
+    - description: Manage a Nomad namespace.
+      name: nomad_namespace
+      namespace: ''
+    - description: Read Nomad namespaces.
+      name: nomad_namespace_info
+      namespace: ''
+    - description: Set the scheduling eligibility or drain of a Nomad node.
+      name: nomad_node
+      namespace: ''
+    - description: Read Nomad client nodes.
+      name: nomad_node_info
+      namespace: ''
+    - description: Manage a Nomad node pool.
+      name: nomad_node_pool
+      namespace: ''
+    - description: Read Nomad node pools.
+      name: nomad_node_pool_info
+      namespace: ''
+    - description: Manage a Nomad quota specification.
+      name: nomad_quota
+      namespace: ''
+    - description: Read Nomad quota specifications.
+      name: nomad_quota_info
+      namespace: ''
+    - description: Manage a Nomad Sentinel policy.
+      name: nomad_sentinel_policy
+      namespace: ''
+    - description: Read Nomad Sentinel policies.
+      name: nomad_sentinel_policy_info
+      namespace: ''
+    - description: Manage a Nomad variable.
+      name: nomad_variable
+      namespace: ''
+    - description: Read Nomad variables.
+      name: nomad_variable_info
+      namespace: ''
+    plugins:
+      lookup:
+      - description: Read a Nomad variable.
+        name: nomad_variable
+        namespace: null
+    release_date: '2026-10-14'

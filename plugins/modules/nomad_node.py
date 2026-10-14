@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_node
 short_description: Set the scheduling eligibility or drain of a Nomad node
+version_added: 0.1.0
 description:
   - Mark a client node eligible or ineligible for scheduling, start a drain, or stop one.
   - The node's current drain flag and eligibility are compared to the options; nothing is written when they already match.

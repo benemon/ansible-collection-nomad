@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_node_pool_info
 short_description: Read Nomad node pools
+version_added: 0.1.0
 description:
   - Return one node pool by name, or every node pool the token can see.
 options:

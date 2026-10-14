@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_acl_token_info
 short_description: Read Nomad ACL tokens
+version_added: 0.1.0
 description:
   - Return the tokens the token can see, optionally narrowed to one accessor ID or name.
   - Secrets are never returned. Use M(benemon.nomad.nomad_acl_token) to create a token and capture its secret.

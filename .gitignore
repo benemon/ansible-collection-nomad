@@ -4,3 +4,4 @@ __pycache__/
 tests/output/
 tests/integration/integration_config.yml
 *.tar.gz
+changelogs/.plugin-cache.yaml

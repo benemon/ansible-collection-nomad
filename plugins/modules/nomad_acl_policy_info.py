@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_acl_policy_info
 short_description: Read Nomad ACL policies
+version_added: 0.1.0
 description:
   - Return one ACL policy by name, or every policy the token can see.
 options:

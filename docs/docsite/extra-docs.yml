@@ -1,0 +1,9 @@
+---
+sections:
+  - title: Guides
+    toctree:
+      - getting_started
+      - jobs
+      - secrets
+      - enterprise
+      - contributing

@@ -1,0 +1,30 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    permissions:
+      contents: read
+    uses: ansible-community/github-docs-build/.github/workflows/_shared-docs-build-push.yml@main
+    with:
+      collection-name: benemon.nomad
+      ansible-ref: stable-2.19
+      init-fail-on-error: true
+      squash-hierarchy: true
+
+  publish:
+    if: github.event_name == 'push'
+    needs: build
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    uses: ansible-community/github-docs-build/.github/workflows/_shared-docs-build-publish-gh-pages.yml@main
+    with:
+      artifact-name: ${{ needs.build.outputs.artifact-name }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_acl_role_info
 short_description: Read Nomad ACL roles
+version_added: 0.1.0
 description:
   - Return one ACL role by name or ID, or every role the token can see.
 options:

@@ -2,6 +2,7 @@
 
 Ansible collection for HashiCorp Nomad and Nomad Enterprise, over the HTTP
 API through [nomadpy](https://pypi.org/project/nomadpy/).
+Documentation: <https://benemon.github.io/ansible-collection-nomad/branch/main/>.
 
 ```yaml
 - hosts: localhost

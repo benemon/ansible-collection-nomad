@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_sentinel_policy_info
 short_description: Read Nomad Sentinel policies
+version_added: 0.1.0
 description:
   - Return one Sentinel policy by name, or every policy the token can see. Enterprise.
 options:

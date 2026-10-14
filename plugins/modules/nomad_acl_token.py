@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_acl_token
 short_description: Manage a Nomad ACL token
+version_added: 0.1.0
 description:
   - Create, update or delete an ACL token.
   - A token is selected by O(accessor_id) when given, otherwise by O(name). Nomad does not keep names unique, so a name

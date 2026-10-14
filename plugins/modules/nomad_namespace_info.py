@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_namespace_info
 short_description: Read Nomad namespaces
+version_added: 0.1.0
 description:
   - Return one namespace by name, or every namespace the token can see.
 options:

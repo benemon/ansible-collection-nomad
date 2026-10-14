@@ -6,6 +6,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: nomad_variable_info
 short_description: Read Nomad variables
+version_added: 0.1.0
 description:
   - Return one variable by path with its items, or the metadata of every variable the token can see.
 options:

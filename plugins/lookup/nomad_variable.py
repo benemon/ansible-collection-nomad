@@ -5,6 +5,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 name: nomad_variable
 short_description: Read a Nomad variable
+version_added: 0.1.0
 description:
   - Return the items of a variable, or one item of it, read inline.
   - A variable that does not exist is an error.
