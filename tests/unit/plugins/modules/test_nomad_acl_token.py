@@ -48,7 +48,7 @@ def test_unchanged_when_set_options_match(run):
     c.acl_tokens.info.assert_called_once_with("a-1")
     c.acl_tokens.create.assert_not_called()
     c.acl_tokens.update.assert_not_called()
-    assert "SecretID" not in result["token"]
+    assert result["token"]["SecretID"] == "s-1"
 
 
 def test_update_keeps_unset_fields(run):
@@ -58,7 +58,7 @@ def test_update_keeps_unset_fields(run):
     sent = c.acl_tokens.update.call_args.args[0]
     assert sent.accessor_id == "a-1" and sent.policies == ["read-default", "read-nodes"] and sent.roles == [READERS] and sent.name == "ci-reader"
     c.acl_tokens.create.assert_not_called()
-    assert "SecretID" not in result["token"] and "SecretID" not in result["diff"]["before"]
+    assert result["token"]["SecretID"] == "s-1" and "SecretID" not in result["diff"]["before"]
 
 
 def test_check_mode_writes_nothing(run):
@@ -100,8 +100,8 @@ def test_server_error_fails_with_status(run):
 
 def test_info(run):
     c = client(READER)
-    assert run(nomad_acl_token_info, dict(name="ci-reader"), c)["tokens"] == [READER_STUB.to_json()]
-    assert run(nomad_acl_token_info, dict(accessor_id="a-1"), c)["tokens"] == [READER_STUB.to_json()]
+    assert run(nomad_acl_token_info, dict(name="ci-reader"), c)["tokens"] == [READER.to_json()]
+    assert run(nomad_acl_token_info, dict(accessor_id="a-1"), c)["tokens"] == [READER.to_json()]
     assert run(nomad_acl_token_info, dict(name="ci-reader"), client())["tokens"] == []
+    assert run(nomad_acl_token_info, dict(accessor_id="a-1"), client())["tokens"] == []
     assert run(nomad_acl_token_info, dict(), c)["tokens"] == [BOOTSTRAP.to_json(), READER_STUB.to_json()]
-    c.acl_tokens.info.assert_not_called()

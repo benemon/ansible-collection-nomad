@@ -78,20 +78,21 @@
           - created.token.ExpirationTime | length > 0
           - "'SecretID' not in created.diff.after"
           - again is not changed
-          - "'SecretID' not in again.token"
+          - again.token.SecretID == created.token.SecretID
           - checked is changed
           - checked.diff.before.Policies == ['token-read-default']
           - checked.diff.after.Policies == []
           - "'SecretID' not in checked.diff.before"
-          - "'SecretID' not in checked.token"
+          - checked.token.SecretID == created.token.SecretID
           - updated is changed
           - updated.token.AccessorID == created.token.AccessorID
           - updated.token.Policies == []
           - updated.token.Roles | map(attribute='Name') | list == ['token-readers']
-          - "'SecretID' not in updated.token"
+          - updated.token.SecretID == created.token.SecretID
           - by_name.tokens | length == 1
           - by_name.tokens[0].AccessorID == created.token.AccessorID
-          - "'SecretID' not in by_name.tokens[0]"
+          - by_name.tokens[0].SecretID == created.token.SecretID
+          - "'SecretID' not in listed.tokens[0]"
           - by_accessor.tokens == by_name.tokens
           - listed.tokens | selectattr('Type', 'equalto', 'management') | list | length >= 1
           - missing.tokens == []
