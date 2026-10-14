@@ -1,0 +1,97 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: Create a node pool
+      benemon.nomad.nomad_node_pool:
+        name: gpu
+        description: GPU nodes
+        meta:
+          tier: compute
+        node_identity_ttl: 12h
+      register: created
+
+    - name: Create it again with the same options
+      benemon.nomad.nomad_node_pool:
+        name: gpu
+        description: GPU nodes
+        meta:
+          tier: compute
+        node_identity_ttl: 12h
+      register: again
+
+    - name: Update only the description, in check mode
+      benemon.nomad.nomad_node_pool:
+        name: gpu
+        description: Accelerators
+      check_mode: true
+      diff: true
+      register: checked
+
+    - name: Read it back
+      benemon.nomad.nomad_node_pool_info:
+        name: gpu
+      register: info
+
+    - name: List node pools
+      benemon.nomad.nomad_node_pool_info:
+      register: listed
+
+    - ansible.builtin.assert:
+        that:
+          - created is changed
+          - created.node_pool.NodeIdentityTTL == '12h0m0s'
+          - created.node_pool.Meta.tier == 'compute'
+          - again is not changed
+          - checked is changed
+          - checked.diff.before.Description == 'GPU nodes'
+          - checked.diff.after.Description == 'Accelerators'
+          - checked.diff.after.NodeIdentityTTL == '12h0m0s'
+          - info.node_pools | length == 1
+          - info.node_pools[0].Description == 'GPU nodes'
+          - "'gpu' in (listed.node_pools | map(attribute='Name'))"
+          - "'default' in (listed.node_pools | map(attribute='Name'))"
+
+    - name: Set a scheduler configuration (Enterprise)
+      benemon.nomad.nomad_node_pool:
+        name: gpu
+        scheduler_configuration:
+          scheduler_algorithm: spread
+          memory_oversubscription_enabled: true
+      register: scheduler
+      ignore_errors: "{{ not nomad_enterprise }}"
+
+    - name: The Community lane gets the server's error for an Enterprise field
+      ansible.builtin.assert:
+        that:
+          - scheduler is failed
+          - scheduler.status_code is defined
+      when: not nomad_enterprise
+
+    - name: The scheduler configuration is stored
+      ansible.builtin.assert:
+        that:
+          - scheduler is changed
+          - scheduler.node_pool.SchedulerConfiguration.SchedulerAlgorithm == 'spread'
+          - scheduler.node_pool.SchedulerConfiguration.MemoryOversubscriptionEnabled == true
+          - scheduler.node_pool.Description == 'GPU nodes'
+      when: nomad_enterprise
+
+    - name: Delete the node pool
+      benemon.nomad.nomad_node_pool:
+        name: gpu
+        state: absent
+      register: deleted
+
+    - name: Delete it again
+      benemon.nomad.nomad_node_pool:
+        name: gpu
+        state: absent
+      register: deleted_again
+
+    - ansible.builtin.assert:
+        that:
+          - deleted is changed
+          - deleted_again is not changed

@@ -1,0 +1,127 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: Create a variable
+      benemon.nomad.nomad_variable:
+        path: db/credentials
+        items:
+          username: app
+          password: s3cret
+      register: created
+
+    - name: Create it again with the same items
+      benemon.nomad.nomad_variable:
+        path: db/credentials
+        items:
+          username: app
+          password: s3cret
+      register: again
+
+    - name: Drop an item, in check mode
+      benemon.nomad.nomad_variable:
+        path: db/credentials
+        items:
+          username: app
+      check_mode: true
+      diff: true
+      register: checked
+
+    - name: Read it back
+      benemon.nomad.nomad_variable_info:
+        path: db/credentials
+      register: info
+
+    - name: List the variables under a prefix
+      benemon.nomad.nomad_variable_info:
+        prefix: db/
+      register: listed
+
+    - name: Read a variable that does not exist
+      benemon.nomad.nomad_variable_info:
+        path: db/missing
+      register: missing
+
+    - name: Look the variable up
+      ansible.builtin.set_fact:
+        looked_up: "{{ lookup('benemon.nomad.nomad_variable', 'db/credentials', address=nomad_address, token=nomad_token) }}"
+        looked_up_key: "{{ lookup('benemon.nomad.nomad_variable', 'db/credentials', key='username', address=nomad_address, token=nomad_token) }}"
+
+    - name: Look up a variable that does not exist
+      ansible.builtin.set_fact:
+        looked_up_missing: "{{ lookup('benemon.nomad.nomad_variable', 'db/missing', address=nomad_address, token=nomad_token) }}"
+      register: lookup_missing
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that:
+          - created is changed
+          - created.variable.Path == 'db/credentials'
+          - created.variable.Items.keys() | sort == ['password', 'username']
+          - created.variable.Items.password == 'VALUE_SPECIFIED_IN_NO_LOG_PARAMETER'
+          - again is not changed
+          - checked is changed
+          - checked.diff.before.Items.password is match('sha256:')
+          - "'s3cret' not in checked.diff | to_json"
+          - "'password' not in checked.diff.after.Items"
+          - info.variables | length == 1
+          - info.variables[0].Items.password == 's3cret'
+          - listed.variables | map(attribute='Path') | list == ['db/credentials']
+          - "'Items' not in listed.variables[0]"
+          - missing.variables == []
+          - looked_up.username == 'app'
+          - looked_up_key == 'app'
+          - lookup_missing is failed
+          - "'db/missing not found' in lookup_missing.msg"
+
+    - name: Create a namespace for the variable
+      benemon.nomad.nomad_namespace:
+        name: vars
+
+    - name: Create the same path in the namespace
+      benemon.nomad.nomad_variable:
+        path: db/credentials
+        namespace: vars
+        items:
+          username: other
+      register: namespaced
+
+    - name: Look it up in the namespace
+      ansible.builtin.set_fact:
+        namespaced_key: "{{ lookup('benemon.nomad.nomad_variable', 'db/credentials', key='username', namespace='vars', address=nomad_address, token=nomad_token) }}"
+
+    - ansible.builtin.assert:
+        that:
+          - namespaced is changed
+          - namespaced.variable.Namespace == 'vars'
+          - namespaced_key == 'other'
+
+    - name: Delete the variable in the namespace
+      benemon.nomad.nomad_variable:
+        path: db/credentials
+        namespace: vars
+        state: absent
+
+    - name: Delete the namespace
+      benemon.nomad.nomad_namespace:
+        name: vars
+        state: absent
+
+    - name: Delete the variable
+      benemon.nomad.nomad_variable:
+        path: db/credentials
+        state: absent
+      register: deleted
+
+    - name: Delete it again
+      benemon.nomad.nomad_variable:
+        path: db/credentials
+        state: absent
+      register: deleted_again
+
+    - ansible.builtin.assert:
+        that:
+          - deleted is changed
+          - deleted_again is not changed

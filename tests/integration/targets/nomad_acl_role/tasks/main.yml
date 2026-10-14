@@ -1,0 +1,112 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: Create the policy the role grants
+      benemon.nomad.nomad_acl_policy:
+        name: role-read-default
+        rules: |
+          namespace "default" {
+            policy = "read"
+          }
+
+    - name: Create a role
+      benemon.nomad.nomad_acl_role:
+        name: readers
+        description: Readers
+        policies: [role-read-default]
+      register: created
+
+    - name: Create it again with the same options
+      benemon.nomad.nomad_acl_role:
+        name: readers
+        description: Readers
+        policies: [role-read-default]
+      register: again
+
+    - name: Update only the description, in check mode
+      benemon.nomad.nomad_acl_role:
+        name: readers
+        description: Read-only operators
+      check_mode: true
+      diff: true
+      register: checked
+
+    - name: Update only the description
+      benemon.nomad.nomad_acl_role:
+        name: readers
+        description: Read-only operators
+      register: updated
+
+    - name: Read it back by name
+      benemon.nomad.nomad_acl_role_info:
+        name: readers
+      register: by_name
+
+    - name: Read it back by ID
+      benemon.nomad.nomad_acl_role_info:
+        id: "{{ created.role.ID }}"
+      register: by_id
+
+    - name: List roles
+      benemon.nomad.nomad_acl_role_info:
+      register: listed
+
+    - name: Read a role that does not exist
+      benemon.nomad.nomad_acl_role_info:
+        name: nobody
+      register: missing
+
+    - ansible.builtin.assert:
+        that:
+          - created is changed
+          - created.role.ID | length > 0
+          - "created.role.Policies == [{'Name': 'role-read-default'}]"
+          - again is not changed
+          - checked is changed
+          - checked.diff.before.Description == 'Readers'
+          - checked.diff.after.Description == 'Read-only operators'
+          - updated is changed
+          - updated.role.ID == created.role.ID
+          - "updated.role.Policies == [{'Name': 'role-read-default'}]"
+          - by_name.roles | length == 1
+          - by_name.roles[0].Description == 'Read-only operators'
+          - by_id.roles == by_name.roles
+          - listed.roles | selectattr('Name', 'equalto', 'readers') | list | length == 1
+          - missing.roles == []
+
+    - name: Reject a policy that does not exist
+      benemon.nomad.nomad_acl_role:
+        name: readers
+        policies: [nothing-here]
+      register: bad
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that:
+          - bad is failed
+          - bad.status_code is defined
+
+    - name: Delete the role
+      benemon.nomad.nomad_acl_role:
+        name: readers
+        state: absent
+      register: deleted
+
+    - name: Delete it again
+      benemon.nomad.nomad_acl_role:
+        name: readers
+        state: absent
+      register: deleted_again
+
+    - name: Delete the policy
+      benemon.nomad.nomad_acl_policy:
+        name: role-read-default
+        state: absent
+
+    - ansible.builtin.assert:
+        that:
+          - deleted is changed
+          - deleted_again is not changed

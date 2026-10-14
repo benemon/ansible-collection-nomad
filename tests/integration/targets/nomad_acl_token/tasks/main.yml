@@ -1,0 +1,138 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: Create the policy the token uses
+      benemon.nomad.nomad_acl_policy:
+        name: token-read-default
+        rules: |
+          namespace "default" {
+            policy = "read"
+          }
+
+    - name: Create the role the token uses
+      benemon.nomad.nomad_acl_role:
+        name: token-readers
+        policies: [token-read-default]
+
+    - name: Create a client token
+      benemon.nomad.nomad_acl_token:
+        name: ci-reader
+        type: client
+        policies: [token-read-default]
+        roles: [token-readers]
+        expiration_ttl: 1h
+      register: created
+      no_log: true
+
+    - name: Create it again with the same options
+      benemon.nomad.nomad_acl_token:
+        name: ci-reader
+        type: client
+        policies: [token-read-default]
+        roles: [token-readers]
+        expiration_ttl: 1h
+      register: again
+
+    - name: Drop the policies, in check mode
+      benemon.nomad.nomad_acl_token:
+        name: ci-reader
+        policies: []
+      check_mode: true
+      diff: true
+      register: checked
+
+    - name: Drop the policies by accessor ID
+      benemon.nomad.nomad_acl_token:
+        accessor_id: "{{ created.token.AccessorID }}"
+        policies: []
+      register: updated
+
+    - name: Read it back by name
+      benemon.nomad.nomad_acl_token_info:
+        name: ci-reader
+      register: by_name
+
+    - name: Read it back by accessor ID
+      benemon.nomad.nomad_acl_token_info:
+        accessor_id: "{{ created.token.AccessorID }}"
+      register: by_accessor
+
+    - name: List tokens
+      benemon.nomad.nomad_acl_token_info:
+      register: listed
+
+    - name: Read a token that does not exist
+      benemon.nomad.nomad_acl_token_info:
+        name: nobody
+      register: missing
+
+    - ansible.builtin.assert:
+        that:
+          - created is changed
+          - created.token.SecretID | length > 0
+          - created.token.Policies == ['token-read-default']
+          - created.token.Roles | map(attribute='Name') | list == ['token-readers']
+          - created.token.ExpirationTime | length > 0
+          - "'SecretID' not in created.diff.after"
+          - again is not changed
+          - "'SecretID' not in again.token"
+          - checked is changed
+          - checked.diff.before.Policies == ['token-read-default']
+          - checked.diff.after.Policies == []
+          - "'SecretID' not in checked.diff.before"
+          - "'SecretID' not in checked.token"
+          - updated is changed
+          - updated.token.AccessorID == created.token.AccessorID
+          - updated.token.Policies == []
+          - updated.token.Roles | map(attribute='Name') | list == ['token-readers']
+          - "'SecretID' not in updated.token"
+          - by_name.tokens | length == 1
+          - by_name.tokens[0].AccessorID == created.token.AccessorID
+          - "'SecretID' not in by_name.tokens[0]"
+          - by_accessor.tokens == by_name.tokens
+          - listed.tokens | selectattr('Type', 'equalto', 'management') | list | length >= 1
+          - missing.tokens == []
+
+    - name: Reject a role that does not exist
+      benemon.nomad.nomad_acl_token:
+        name: ci-reader
+        roles: [nothing-here]
+      register: bad
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that:
+          - bad is failed
+          - bad.status_code is defined
+
+    - name: Delete the token
+      benemon.nomad.nomad_acl_token:
+        name: ci-reader
+        state: absent
+      diff: true
+      register: deleted
+
+    - name: Delete it again
+      benemon.nomad.nomad_acl_token:
+        name: ci-reader
+        state: absent
+      register: deleted_again
+
+    - name: Delete the role
+      benemon.nomad.nomad_acl_role:
+        name: token-readers
+        state: absent
+
+    - name: Delete the policy
+      benemon.nomad.nomad_acl_policy:
+        name: token-read-default
+        state: absent
+
+    - ansible.builtin.assert:
+        that:
+          - deleted is changed
+          - "'SecretID' not in deleted.diff.before"
+          - deleted_again is not changed

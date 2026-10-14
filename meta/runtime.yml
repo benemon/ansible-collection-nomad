@@ -1,0 +1,24 @@
+---
+requires_ansible: ">=2.19.0"
+action_groups:
+  nomad:
+    - nomad_acl_policy
+    - nomad_acl_policy_info
+    - nomad_acl_role
+    - nomad_acl_role_info
+    - nomad_acl_token
+    - nomad_acl_token_info
+    - nomad_job
+    - nomad_job_info
+    - nomad_namespace
+    - nomad_namespace_info
+    - nomad_node
+    - nomad_node_info
+    - nomad_node_pool
+    - nomad_node_pool_info
+    - nomad_quota
+    - nomad_quota_info
+    - nomad_sentinel_policy
+    - nomad_sentinel_policy_info
+    - nomad_variable
+    - nomad_variable_info

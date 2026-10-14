@@ -1,0 +1,125 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: Job specification
+      ansible.builtin.set_fact:
+        web_hcl: |
+          job "web" {
+            datacenters = ["dc1"]
+            type        = "service"
+            group "g" {
+              count = 1
+              update {
+                min_healthy_time = "1s"
+                healthy_deadline = "30s"
+              }
+              task "t" {
+                driver = "raw_exec"
+                config {
+                  command = "/bin/sh"
+                  args    = ["-c", "sleep 600"]
+                }
+                resources {
+                  cpu    = 10
+                  memory = 32
+                }
+              }
+            }
+          }
+
+    - name: Register the job from HCL and wait for the deployment
+      benemon.nomad.nomad_job:
+        jobspec: "{{ web_hcl }}"
+      register: registered
+
+    - name: Register the same specification again
+      benemon.nomad.nomad_job:
+        jobspec: "{{ web_hcl }}"
+      register: again
+
+    - name: Plan a change in check mode
+      benemon.nomad.nomad_job:
+        jobspec: "{{ web_hcl | replace('count = 1', 'count = 2') }}"
+      check_mode: true
+      diff: true
+      register: checked
+
+    - name: Register the change from the JSON document as text
+      benemon.nomad.nomad_job:
+        jobspec: "{{ checked.diff.after | to_json }}"
+      register: scaled
+
+    - name: Register the same document as a dict
+      benemon.nomad.nomad_job:
+        jobspec: "{{ checked.diff.after }}"
+      register: scaled_again
+
+    - name: Read it back
+      benemon.nomad.nomad_job_info:
+        name: web
+      register: info
+
+    - name: List jobs
+      benemon.nomad.nomad_job_info:
+      register: listed
+
+    - ansible.builtin.assert:
+        that:
+          - registered is changed
+          - registered.deployment.Status == 'successful'
+          - registered.job.Status == 'running'
+          - again is not changed
+          - checked is changed
+          - checked.diff.before.TaskGroups[0].Count == 1
+          - checked.diff.after.TaskGroups[0].Count == 2
+          - scaled is changed
+          - scaled.deployment.Status == 'successful'
+          - scaled_again is not changed
+          - info.jobs[0].TaskGroups[0].Count == 2
+          - listed.jobs | map(attribute='ID') | list == ['web']
+
+    - name: A name that does not match the specification fails
+      benemon.nomad.nomad_job:
+        name: other
+        jobspec: "{{ web_hcl }}"
+      register: mismatch
+      ignore_errors: true
+
+    - name: Stop the job
+      benemon.nomad.nomad_job:
+        name: web
+        state: absent
+      diff: true
+      register: stopped
+
+    - name: Stop it again
+      benemon.nomad.nomad_job:
+        name: web
+        state: absent
+      register: stopped_again
+
+    - name: Purge it
+      benemon.nomad.nomad_job:
+        name: web
+        state: absent
+        purge: true
+      register: purged
+
+    - name: Purge it again
+      benemon.nomad.nomad_job:
+        name: web
+        state: absent
+        purge: true
+      register: purged_again
+
+    - ansible.builtin.assert:
+        that:
+          - mismatch is failed
+          - stopped is changed
+          - stopped.diff.before.ID == 'web'
+          - stopped_again is not changed
+          - purged is changed
+          - purged_again is not changed

@@ -1,0 +1,108 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: Create a quota specification
+      benemon.nomad.nomad_quota:
+        name: web
+        description: Web tier
+        limits:
+          - region: global
+            region_limit:
+              cpu: 2500
+              memory_mb: 1000
+              storage:
+                variables_mb: 100
+              node_pools:
+                - node_pool: default
+                  memory_mb: 500
+            variables_limit: 100
+      register: created
+      ignore_errors: "{{ not nomad_enterprise }}"
+
+    - name: The Community lane gets the server's 501
+      ansible.builtin.assert:
+        that:
+          - created is failed
+          - created.status_code == 501
+      when: not nomad_enterprise
+
+    - name: Exercise the quota specification
+      when: nomad_enterprise
+      block:
+        - name: Create it again with the same options
+          benemon.nomad.nomad_quota:
+            name: web
+            description: Web tier
+            limits:
+              - region: global
+                region_limit:
+                  cpu: 2500
+                  memory_mb: 1000
+                  storage:
+                    variables_mb: 100
+                  node_pools:
+                    - node_pool: default
+                      memory_mb: 500
+                variables_limit: 100
+          register: again
+
+        - name: Raise the CPU limit, in check mode
+          benemon.nomad.nomad_quota:
+            name: web
+            limits:
+              - region: global
+                region_limit:
+                  cpu: 5000
+          check_mode: true
+          diff: true
+          register: checked
+
+        - name: Read it back
+          benemon.nomad.nomad_quota_info:
+            name: web
+          register: info
+
+        - name: List quota specifications
+          benemon.nomad.nomad_quota_info:
+          register: listed
+
+        - ansible.builtin.assert:
+            that:
+              - created is changed
+              - created.quota.Limits[0].RegionLimit.CPU == 2500
+              - created.quota.Limits[0].RegionLimit.Storage.VariablesMB == 100
+              - created.quota.Limits[0].RegionLimit.NodePools[0].MemoryMB == 500
+              - again is not changed
+              - checked is changed
+              - checked.diff.before.Limits[0].RegionLimit.CPU == 2500
+              - checked.diff.after.Limits[0].RegionLimit.CPU == 5000
+              - checked.diff.after.Description == 'Web tier'
+              - info.quotas | length == 1
+              - info.quotas[0].Limits[0].RegionLimit.MemoryMB == 1000
+              - listed.quotas | map(attribute='Name') | list == ['web']
+
+        - name: Delete the quota specification
+          benemon.nomad.nomad_quota:
+            name: web
+            state: absent
+          register: deleted
+
+        - name: Delete it again
+          benemon.nomad.nomad_quota:
+            name: web
+            state: absent
+          register: deleted_again
+
+        - name: A missing quota specification reads as an empty list
+          benemon.nomad.nomad_quota_info:
+            name: web
+          register: missing
+
+        - ansible.builtin.assert:
+            that:
+              - deleted is changed
+              - deleted_again is not changed
+              - missing.quotas == []

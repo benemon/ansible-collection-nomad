@@ -1,0 +1,39 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Tag matches the collection version
+        run: |
+          version=$(awk '/^version:/ {print $2}' galaxy.yml)
+          test "v${version}" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} does not match version ${version}"; exit 1; }
+      - name: Tagged commit has a green test run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${GITHUB_SHA}&status=success" --jq '[.workflow_runs[] | select(.name == "test")] | length')
+          test "${n}" -ge 1 || { echo "no successful test run for ${GITHUB_SHA}"; exit 1; }
+      - name: Build
+        run: |
+          python -m pip install ansible-core
+          ansible-galaxy collection build
+      - name: Publish to Ansible Galaxy
+        env:
+          ANSIBLE_GALAXY_API_KEY: ${{ secrets.ANSIBLE_GALAXY_API_KEY }}
+        run: ansible-galaxy collection publish --api-key "$ANSIBLE_GALAXY_API_KEY" benemon-nomad-*.tar.gz
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" benemon-nomad-*.tar.gz --repo "${GITHUB_REPOSITORY}" --title "${GITHUB_REF_NAME}" --generate-notes

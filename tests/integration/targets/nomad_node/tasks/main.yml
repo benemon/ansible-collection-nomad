@@ -1,0 +1,91 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: List the nodes
+      benemon.nomad.nomad_node_info:
+      register: listed
+
+    - name: The dev agent's client node
+      ansible.builtin.set_fact:
+        node_id: "{{ listed.nodes[0].ID }}"
+        node_name: "{{ listed.nodes[0].Name }}"
+
+    - name: Mark the node ineligible
+      benemon.nomad.nomad_node:
+        node_id: "{{ node_id }}"
+        eligibility: ineligible
+      register: ineligible
+
+    - name: Mark it ineligible again
+      benemon.nomad.nomad_node:
+        node_id: "{{ node_id }}"
+        eligibility: ineligible
+      register: ineligible_again
+
+    - name: Mark it eligible, in check mode
+      benemon.nomad.nomad_node:
+        name: "{{ node_name }}"
+        eligibility: eligible
+      check_mode: true
+      diff: true
+      register: checked
+
+    - name: Mark it eligible
+      benemon.nomad.nomad_node:
+        name: "{{ node_name }}"
+        eligibility: eligible
+      register: eligible
+
+    - name: Drain the node and wait for the drain to finish
+      benemon.nomad.nomad_node:
+        node_id: "{{ node_id }}"
+        drain: true
+        ignore_system_jobs: true
+        deadline: 1m
+      register: drained
+
+    - name: Stop the drain and mark the node eligible
+      benemon.nomad.nomad_node:
+        node_id: "{{ node_id }}"
+        drain: false
+        mark_eligible: true
+      register: undrained
+
+    - name: Read the node by ID
+      benemon.nomad.nomad_node_info:
+        node_id: "{{ node_id }}"
+      register: by_id
+
+    - name: Read the node by name
+      benemon.nomad.nomad_node_info:
+        name: "{{ node_name }}"
+      register: by_name
+
+    - name: Read a node that does not exist
+      benemon.nomad.nomad_node_info:
+        name: no-such-node
+      register: missing
+
+    - ansible.builtin.assert:
+        that:
+          - listed.nodes | length == 1
+          - ineligible is changed
+          - ineligible.node.SchedulingEligibility == 'ineligible'
+          - ineligible_again is not changed
+          - checked is changed
+          - checked.diff.before.SchedulingEligibility == 'ineligible'
+          - checked.diff.after.SchedulingEligibility == 'eligible'
+          - eligible is changed
+          - eligible.node.SchedulingEligibility == 'eligible'
+          - drained is changed
+          - not drained.node.Drain
+          - drained.node.SchedulingEligibility == 'ineligible'
+          - drained.node.LastDrain.Status == 'complete'
+          - undrained.node.SchedulingEligibility == 'eligible'
+          - by_id.nodes[0].ID == node_id
+          - by_id.nodes[0].HTTPAddr is defined
+          - by_name.nodes[0].ID == node_id
+          - missing.nodes == []

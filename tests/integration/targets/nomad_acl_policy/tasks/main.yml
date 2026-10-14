@@ -1,0 +1,91 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: Create a policy attached to a job
+      benemon.nomad.nomad_acl_policy:
+        name: read-default
+        description: Read default
+        rules: |
+          namespace "default" {
+            policy = "read"
+          }
+        job_acl:
+          namespace: default
+          job_id: web
+      register: created
+
+    - name: Create it again with the same options
+      benemon.nomad.nomad_acl_policy:
+        name: read-default
+        description: Read default
+        rules: |
+          namespace "default" {
+            policy = "read"
+          }
+        job_acl:
+          namespace: default
+          job_id: web
+      register: again
+
+    - name: Update only the description, in check mode
+      benemon.nomad.nomad_acl_policy:
+        name: read-default
+        description: Readers
+      check_mode: true
+      diff: true
+      register: checked
+
+    - name: Read it back
+      benemon.nomad.nomad_acl_policy_info:
+        name: read-default
+      register: info
+
+    - name: List policies
+      benemon.nomad.nomad_acl_policy_info:
+      register: listed
+
+    - ansible.builtin.assert:
+        that:
+          - created is changed
+          - created.policy.JobACL.JobID == 'web'
+          - again is not changed
+          - checked is changed
+          - checked.diff.before.Description == 'Read default'
+          - checked.diff.after.Description == 'Readers'
+          - info.policies | length == 1
+          - info.policies[0].Description == 'Read default'
+          - "'policy = \"read\"' in info.policies[0].Rules"
+          - listed.policies | selectattr('Name', 'equalto', 'read-default') | list | length == 1
+          - "'Rules' not in listed.policies[0]"
+
+    - name: Reject rules the server cannot parse
+      benemon.nomad.nomad_acl_policy:
+        name: read-default
+        rules: nonsense {
+      register: bad
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that:
+          - bad is failed
+          - bad.status_code is defined
+
+    - name: Delete the policy
+      benemon.nomad.nomad_acl_policy:
+        name: read-default
+        state: absent
+      register: deleted
+
+    - name: Delete it again
+      benemon.nomad.nomad_acl_policy:
+        name: read-default
+        state: absent
+      register: deleted_again
+
+    - ansible.builtin.assert:
+        that:
+          - deleted is changed
+          - deleted_again is not changed

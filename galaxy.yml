@@ -1,0 +1,23 @@
+namespace: benemon
+name: nomad
+version: 0.1.0
+readme: README.md
+authors:
+  - Benjamin Holmes <benjamin.holmes@gmail.com>
+description: Manage HashiCorp Nomad and Nomad Enterprise clusters over the HTTP API
+license:
+  - GPL-3.0-or-later
+tags:
+  - nomad
+  - hashicorp
+  - scheduler
+  - cloud
+dependencies: {}
+repository: https://github.com/benemon/ansible-collection-nomad
+issues: https://github.com/benemon/ansible-collection-nomad/issues
+build_ignore:
+  - ".*"
+  - tests/output
+  - tests/integration/integration_config.yml
+  - "*.tar.gz"
+  - Makefile

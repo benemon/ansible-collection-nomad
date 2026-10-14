@@ -1,0 +1,88 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: Create a Sentinel policy
+      benemon.nomad.nomad_sentinel_policy:
+        name: allow
+        description: Allow every job
+        scope: submit-job
+        enforcement_level: advisory
+        policy: main = rule { true }
+      register: created
+      ignore_errors: "{{ not nomad_enterprise }}"
+
+    - name: The Community lane gets the server's 501
+      ansible.builtin.assert:
+        that:
+          - created is failed
+          - created.status_code == 501
+      when: not nomad_enterprise
+
+    - name: Exercise the Sentinel policy
+      when: nomad_enterprise
+      block:
+        - name: Create it again with the same options
+          benemon.nomad.nomad_sentinel_policy:
+            name: allow
+            description: Allow every job
+            scope: submit-job
+            enforcement_level: advisory
+            policy: main = rule { true }
+          register: again
+
+        - name: Make it mandatory, in check mode
+          benemon.nomad.nomad_sentinel_policy:
+            name: allow
+            enforcement_level: hard-mandatory
+          check_mode: true
+          diff: true
+          register: checked
+
+        - name: Read it back
+          benemon.nomad.nomad_sentinel_policy_info:
+            name: allow
+          register: info
+
+        - name: List Sentinel policies
+          benemon.nomad.nomad_sentinel_policy_info:
+          register: listed
+
+        - ansible.builtin.assert:
+            that:
+              - created is changed
+              - created.sentinel_policy.Policy == 'main = rule { true }'
+              - again is not changed
+              - checked is changed
+              - checked.diff.before.EnforcementLevel == 'advisory'
+              - checked.diff.after.EnforcementLevel == 'hard-mandatory'
+              - checked.diff.after.Policy == 'main = rule { true }'
+              - info.sentinel_policies | length == 1
+              - info.sentinel_policies[0].Scope == 'submit-job'
+              - listed.sentinel_policies | map(attribute='Name') | list == ['allow']
+              - "'Policy' not in listed.sentinel_policies[0]"
+
+        - name: Delete the Sentinel policy
+          benemon.nomad.nomad_sentinel_policy:
+            name: allow
+            state: absent
+          register: deleted
+
+        - name: Delete it again
+          benemon.nomad.nomad_sentinel_policy:
+            name: allow
+            state: absent
+          register: deleted_again
+
+        - name: A missing policy reads as an empty list
+          benemon.nomad.nomad_sentinel_policy_info:
+            name: allow
+          register: missing
+
+        - ansible.builtin.assert:
+            that:
+              - deleted is changed
+              - deleted_again is not changed
+              - missing.sentinel_policies == []
