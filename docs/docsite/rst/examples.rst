@@ -123,7 +123,7 @@ stops the drain and marks the node eligible again.
        name: "{{ node_name }}"
        drain: true
        ignore_system_jobs: true
-       deadline: 5m
+       deadline: 1m
 
    - name: Stop the drain and let the scheduler use the node again
      benemon.nomad.nomad_node:
