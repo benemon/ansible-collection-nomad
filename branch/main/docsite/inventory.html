@@ -1,0 +1,364 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="../_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="../_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7f41d439"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Enterprise behaviour" href="enterprise.html" />
+    <link rel="prev" title="Secrets" href="secrets.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="../_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jobs.html">Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="secrets.html">Secrets</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Inventory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#host-variables">Host variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#groups">Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#allocation-hosts">Allocation hosts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#node-detail">Node detail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#caching">Caching</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="enterprise.html">Enterprise behaviour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_policy_module.html">benemon.nomad.nomad_acl_policy module – Manage a Nomad ACL policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_policy_info_module.html">benemon.nomad.nomad_acl_policy_info module – Read Nomad ACL policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_role_module.html">benemon.nomad.nomad_acl_role module – Manage a Nomad ACL role</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_role_info_module.html">benemon.nomad.nomad_acl_role_info module – Read Nomad ACL roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_module.html">benemon.nomad.nomad_acl_token module – Manage a Nomad ACL token</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_info_module.html">benemon.nomad.nomad_acl_token_info module – Read Nomad ACL tokens</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_job_module.html">benemon.nomad.nomad_job module – Register or stop a Nomad job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_job_info_module.html">benemon.nomad.nomad_job_info module – Read Nomad jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_namespace_module.html">benemon.nomad.nomad_namespace module – Manage a Nomad namespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_namespace_info_module.html">benemon.nomad.nomad_namespace_info module – Read Nomad namespaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_module.html">benemon.nomad.nomad_node module – Set the scheduling eligibility or drain of a Nomad node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_info_module.html">benemon.nomad.nomad_node_info module – Read Nomad client nodes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_pool_module.html">benemon.nomad.nomad_node_pool module – Manage a Nomad node pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_node_pool_info_module.html">benemon.nomad.nomad_node_pool_info module – Read Nomad node pools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_quota_module.html">benemon.nomad.nomad_quota module – Manage a Nomad quota specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_quota_info_module.html">benemon.nomad.nomad_quota_info module – Read Nomad quota specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_module.html">benemon.nomad.nomad_sentinel_policy module – Manage a Nomad Sentinel policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_info_module.html">benemon.nomad.nomad_sentinel_policy_info module – Read Nomad Sentinel policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_module.html">benemon.nomad.nomad_variable module – Manage a Nomad variable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_info_module.html">benemon.nomad.nomad_variable_info module – Read Nomad variables</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_inventory.html">benemon.nomad.nomad inventory – Nomad client nodes, server members and allocations as hosts</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_variable_lookup.html">benemon.nomad.nomad_variable lookup – Read a Nomad variable</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Inventory</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <section id="inventory">
+<span id="ansible-collections-benemon-nomad-docsite-inventory"></span><h1>Inventory<a class="headerlink" href="#inventory" title="Link to this heading"></a></h1>
+<p><a class="reference internal" href="../nomad_inventory.html#ansible-collections-benemon-nomad-nomad-inventory"><span class="std std-ref">benemon.nomad.nomad</span></a> builds an inventory from a Nomad
+cluster. By default the hosts are the client nodes. Server members and
+running allocations are added on request.</p>
+<p>The plugin reads a file whose name ends in <code class="docutils literal notranslate"><span class="pre">nomad.yml</span></code> or <code class="docutils literal notranslate"><span class="pre">nomad.yaml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># cluster.nomad.yml</span>
+<span class="nt">plugin</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">benemon.nomad.nomad</span>
+<span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://nomad.example.com:4646</span>
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ansible-inventory -i cluster.nomad.yml --graph</span>
+</pre></div>
+</div>
+<p>Connection options are the ones every plugin in the collection takes, with
+the same environment fallbacks; see
+<a class="reference internal" href="getting_started.html#ansible-collections-benemon-nomad-docsite-getting-started"><span class="std std-ref">Getting started</span></a>. The plugin
+is outside the action group and does not see <code class="docutils literal notranslate"><span class="pre">module_defaults</span></code>.</p>
+<section id="host-variables">
+<h2>Host variables<a class="headerlink" href="#host-variables" title="Link to this heading"></a></h2>
+<p>Each host carries the Nomad API document it was built from, with the API’s
+field names:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Host</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">ansible_host</span></code></p></th>
+<th class="head"><p>Variable</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Client node</p></td>
+<td><p>the node’s <code class="docutils literal notranslate"><span class="pre">Name</span></code></p></td>
+<td><p>the node’s <code class="docutils literal notranslate"><span class="pre">Address</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nomad_node</span></code>, the <a class="reference external" href="https://developer.hashicorp.com/nomad/api-docs/nodes#list-nodes">node list</a> stub</p></td>
+</tr>
+<tr class="row-odd"><td><p>Server member</p></td>
+<td><p>the member’s <code class="docutils literal notranslate"><span class="pre">Name</span></code>, which Nomad writes as <code class="docutils literal notranslate"><span class="pre">&lt;node&gt;.&lt;region&gt;</span></code></p></td>
+<td><p>the member’s <code class="docutils literal notranslate"><span class="pre">Addr</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nomad_member</span></code>, the <a class="reference external" href="https://developer.hashicorp.com/nomad/api-docs/agent#list-members">agent members</a> entry</p></td>
+</tr>
+<tr class="row-even"><td><p>Allocation</p></td>
+<td><p>see below</p></td>
+<td><p>chosen by <code class="docutils literal notranslate"><span class="pre">allocation_address</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nomad_allocation</span></code>, the <a class="reference external" href="https://developer.hashicorp.com/nomad/api-docs/allocations#list-allocations">allocation list</a> stub with <code class="docutils literal notranslate"><span class="pre">AllocatedResources</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="groups">
+<h2>Groups<a class="headerlink" href="#groups" title="Link to this heading"></a></h2>
+<p>Hosts are placed in groups by the fields of their document. Group names pass
+through Ansible’s usual sanitising, so a datacenter <code class="docutils literal notranslate"><span class="pre">eu-west</span></code> gives
+<code class="docutils literal notranslate"><span class="pre">nomad_datacenter_eu_west</span></code>.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Group</p></th>
+<th class="head"><p>Members</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nomad_clients</span></code></p></td>
+<td><p>every client node</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nomad_datacenter_&lt;dc&gt;</span></code></p></td>
+<td><p>client nodes and server members in the datacenter</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nomad_node_pool_&lt;pool&gt;</span></code></p></td>
+<td><p>client nodes in the node pool</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nomad_node_class_&lt;class&gt;</span></code></p></td>
+<td><p>client nodes with a node class</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nomad_status_&lt;status&gt;</span></code></p></td>
+<td><p>client nodes by <code class="docutils literal notranslate"><span class="pre">Status</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nomad_eligibility_&lt;eligibility&gt;</span></code></p></td>
+<td><p>client nodes by <code class="docutils literal notranslate"><span class="pre">SchedulingEligibility</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nomad_driver_&lt;driver&gt;</span></code></p></td>
+<td><p>client nodes on which the driver is detected</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nomad_servers</span></code></p></td>
+<td><p>every server member</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nomad_allocations</span></code></p></td>
+<td><p>every running allocation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nomad_namespace_&lt;namespace&gt;</span></code></p></td>
+<td><p>allocations in the namespace</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nomad_job_&lt;job&gt;</span></code></p></td>
+<td><p>allocations of the job</p></td>
+</tr>
+</tbody>
+</table>
+<p>The <code class="docutils literal notranslate"><span class="pre">keyed_groups</span></code>, <code class="docutils literal notranslate"><span class="pre">groups</span></code> and <code class="docutils literal notranslate"><span class="pre">compose</span></code> options of the
+<code class="docutils literal notranslate"><span class="pre">constructed</span></code> fragment add groups and variables from any field of the host
+variables:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">plugin</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">benemon.nomad.nomad</span>
+<span class="nt">keyed_groups</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nomad_node.Attributes['os.name']</span>
+<span class="w">    </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">os</span>
+<span class="nt">compose</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">nomad_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nomad_node.Version</span>
+</pre></div>
+</div>
+</section>
+<section id="allocation-hosts">
+<h2>Allocation hosts<a class="headerlink" href="#allocation-hosts" title="Link to this heading"></a></h2>
+<p>With <code class="docutils literal notranslate"><span class="pre">allocations:</span> <span class="pre">true</span></code> every running allocation is a host. Task drivers
+such as QEMU run guests that Ansible reaches directly, so an allocation host
+needs an address; <code class="docutils literal notranslate"><span class="pre">allocation_address</span></code> says where it comes from.</p>
+<p>The host name is <code class="docutils literal notranslate"><span class="pre">&lt;namespace&gt;.&lt;job&gt;.&lt;group&gt;.&lt;index&gt;</span></code>: allocation
+<code class="docutils literal notranslate"><span class="pre">web.web[0]</span></code> in the <code class="docutils literal notranslate"><span class="pre">default</span></code> namespace is the host <code class="docutils literal notranslate"><span class="pre">default.web.web.0</span></code>.
+The API’s own allocation name contains <code class="docutils literal notranslate"><span class="pre">[0]</span></code>, which an Ansible host pattern
+reads as a group slice, and names repeat across namespaces.</p>
+<p><code class="docutils literal notranslate"><span class="pre">namespace</span></code> selects the namespace whose allocations are listed and defaults
+to <code class="docutils literal notranslate"><span class="pre">*</span></code>, every namespace the token can read.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">node</span></code></dt><dd><p>The default. The address of the node the allocation runs on. Right for
+tasks that share the node’s network, and the only strategy that needs no
+more than the node and allocation lists.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">plugin</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">benemon.nomad.nomad</span>
+<span class="nt">allocations</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">network</span></code></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">IP</span></code> of the first network in the allocation’s <code class="docutils literal notranslate"><span class="pre">AllocatedResources</span></code>:
+the bridge or CNI address of a group with a <code class="docutils literal notranslate"><span class="pre">network</span></code> block in a mode
+other than <code class="docutils literal notranslate"><span class="pre">host</span></code>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">plugin</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">benemon.nomad.nomad</span>
+<span class="nt">allocations</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">allocation_address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">network</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">service:&lt;name&gt;</span></code></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">Address</span></code> and <code class="docutils literal notranslate"><span class="pre">Port</span></code> the allocation registered for the named
+<a class="reference external" href="https://developer.hashicorp.com/nomad/docs/job-specification/service">Nomad service</a>
+(<code class="docutils literal notranslate"><span class="pre">provider</span> <span class="pre">=</span> <span class="pre">&quot;nomad&quot;</span></code>). <code class="docutils literal notranslate"><span class="pre">ansible_port</span></code> is set as well. A guest that
+registers its SSH port as a service is reached at that port.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">plugin</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">benemon.nomad.nomad</span>
+<span class="nt">clients</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nt">allocations</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vms</span>
+<span class="nt">allocation_address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">service:ssh</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">meta:&lt;key&gt;</span></code></dt><dd><p>The value of the key in the job’s
+<a class="reference external" href="https://developer.hashicorp.com/nomad/docs/job-specification/meta">meta</a>,
+looking first at the tasks of the allocation’s task group, then at the task
+group, then at the job. One job read per job with running allocations.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">plugin</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">benemon.nomad.nomad</span>
+<span class="nt">allocations</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">allocation_address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">meta:ansible_host</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>An allocation whose address is not found by the chosen strategy is still a
+host, without <code class="docutils literal notranslate"><span class="pre">ansible_host</span></code>.</p>
+</section>
+<section id="node-detail">
+<h2>Node detail<a class="headerlink" href="#node-detail" title="Link to this heading"></a></h2>
+<p>The node list stub carries <code class="docutils literal notranslate"><span class="pre">Drivers</span></code> and the resource fields;
+<code class="docutils literal notranslate"><span class="pre">Attributes</span></code>, <code class="docutils literal notranslate"><span class="pre">Meta</span></code>, <code class="docutils literal notranslate"><span class="pre">Links</span></code> and <code class="docutils literal notranslate"><span class="pre">HostVolumes</span></code> are in the
+<a class="reference external" href="https://developer.hashicorp.com/nomad/api-docs/nodes#read-node">node read</a>
+document only. <code class="docutils literal notranslate"><span class="pre">node_detail:</span> <span class="pre">true</span></code> reads every client node in full, one
+request per node, and <code class="docutils literal notranslate"><span class="pre">nomad_node</span></code> becomes that document. <code class="docutils literal notranslate"><span class="pre">ansible_host</span></code>
+stays the address from the list, which the full document does not carry.</p>
+</section>
+<section id="caching">
+<h2>Caching<a class="headerlink" href="#caching" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">inventory_cache</span></code> options apply. One run’s reads are stored as the
+documents above and the next run builds the same hosts from them without
+touching the API, until the cache times out or <code class="docutils literal notranslate"><span class="pre">--flush-cache</span></code> is given.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">plugin</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">benemon.nomad.nomad</span>
+<span class="nt">cache</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">cache_plugin</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ansible.builtin.jsonfile</span>
+<span class="nt">cache_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/tmp/nomad-inventory</span>
+<span class="nt">cache_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="secrets.html" class="btn btn-neutral float-left" title="Secrets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="enterprise.html" class="btn btn-neutral float-right" title="Enterprise behaviour" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>

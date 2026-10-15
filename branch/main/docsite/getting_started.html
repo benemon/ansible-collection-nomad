@@ -81,6 +81,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="jobs.html">Jobs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="secrets.html">Secrets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inventory.html">Inventory</a></li>
 <li class="toctree-l1"><a class="reference internal" href="enterprise.html">Enterprise behaviour</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
@@ -106,6 +107,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_info_module.html">benemon.nomad.nomad_sentinel_policy_info module – Read Nomad Sentinel policies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_variable_module.html">benemon.nomad.nomad_variable module – Manage a Nomad variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_variable_info_module.html">benemon.nomad.nomad_variable_info module – Read Nomad variables</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_inventory.html">benemon.nomad.nomad inventory – Nomad client nodes, server members and allocations as hosts</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_variable_lookup.html">benemon.nomad.nomad_variable lookup – Read a Nomad variable</a></li>
@@ -223,9 +227,11 @@ connection once with <code class="docutils literal notranslate"><span class="pre
 <span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Web tier</span>
 </pre></div>
 </div>
-<p>The <a class="reference internal" href="../nomad_variable_lookup.html#ansible-collections-benemon-nomad-nomad-variable-lookup"><span class="std std-ref">benemon.nomad.nomad_variable</span></a> lookup is outside the
-action group and does not see <code class="docutils literal notranslate"><span class="pre">module_defaults</span></code>. Pass its connection options
-as keyword arguments or set the environment variables.</p>
+<p>The <a class="reference internal" href="../nomad_variable_lookup.html#ansible-collections-benemon-nomad-nomad-variable-lookup"><span class="std std-ref">benemon.nomad.nomad_variable</span></a> lookup and the
+<a class="reference internal" href="../nomad_inventory.html#ansible-collections-benemon-nomad-nomad-inventory"><span class="std std-ref">benemon.nomad.nomad</span></a> inventory plugin are outside the
+action group and do not see <code class="docutils literal notranslate"><span class="pre">module_defaults</span></code>. Pass their connection options
+as keyword arguments or inventory file options, or set the environment
+variables.</p>
 </section>
 <section id="how-the-modules-behave">
 <h2>How the modules behave<a class="headerlink" href="#how-the-modules-behave" title="Link to this heading"></a></h2>
