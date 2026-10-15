@@ -84,3 +84,42 @@ releases:
         name: nomad_variable
         namespace: null
     release_date: '2026-10-14'
+  0.2.0:
+    changes:
+      minor_changes:
+      - The collection requires nomadpy 0.2.0 or newer with its ``exec`` extra, which
+        installs the ``websockets`` package the connection plugin uses, and Python
+        3.11 or newer.
+      release_summary: 'Inventory, exec and allocation control: the ``nomad`` inventory
+        plugin lists client nodes, server members and
+
+        running allocations with every address the API attaches to them; the ``nomad_exec``
+        connection plugin runs tasks
+
+        inside an allocation''s task over the exec API; ``nomad_allocation`` and ``nomad_allocation_info``
+        restart, signal,
+
+        stop and read allocations and their task logs. Requires nomadpy 0.2.0 with
+        its ``exec`` extra and Python 3.11.
+
+        '
+    fragments:
+    - 0.2.0.yml
+    - requirements.yml
+    modules:
+    - description: Restart, signal or stop a Nomad allocation.
+      name: nomad_allocation
+      namespace: ''
+    - description: Read Nomad allocations and their task logs.
+      name: nomad_allocation_info
+      namespace: ''
+    plugins:
+      connection:
+      - description: Run tasks inside a task of a Nomad allocation.
+        name: nomad_exec
+        namespace: null
+      inventory:
+      - description: Nomad client nodes, server members and allocations as hosts.
+        name: nomad
+        namespace: null
+    release_date: '2026-10-15'

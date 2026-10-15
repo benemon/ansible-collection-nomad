@@ -4,6 +4,41 @@ benemon.nomad Release Notes
 
 .. contents:: Topics
 
+v0.2.0
+======
+
+Release Summary
+---------------
+
+Inventory, exec and allocation control: the ``nomad`` inventory plugin lists client nodes, server members and
+running allocations with every address the API attaches to them; the ``nomad_exec`` connection plugin runs tasks
+inside an allocation's task over the exec API; ``nomad_allocation`` and ``nomad_allocation_info`` restart, signal,
+stop and read allocations and their task logs. Requires nomadpy 0.2.0 with its ``exec`` extra and Python 3.11.
+
+Minor Changes
+-------------
+
+- The collection requires nomadpy 0.2.0 or newer with its ``exec`` extra, which installs the ``websockets`` package the connection plugin uses, and Python 3.11 or newer.
+
+New Plugins
+-----------
+
+Connection
+~~~~~~~~~~
+
+- benemon.nomad.nomad_exec - Run tasks inside a task of a Nomad allocation.
+
+Inventory
+~~~~~~~~~
+
+- benemon.nomad.nomad - Nomad client nodes, server members and allocations as hosts.
+
+New Modules
+-----------
+
+- benemon.nomad.nomad_allocation - Restart, signal or stop a Nomad allocation.
+- benemon.nomad.nomad_allocation_info - Read Nomad allocations and their task logs.
+
 v0.1.0
 ======
 
