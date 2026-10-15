@@ -1,0 +1,2 @@
+minor_changes:
+  - The collection requires nomadpy 0.2.0 or newer with its ``exec`` extra, which installs the ``websockets`` package the connection plugin uses, and Python 3.11 or newer.

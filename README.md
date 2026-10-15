@@ -28,7 +28,8 @@ Enterprise request fails with the server's own error.
 
 ## Install
 
-Requires ansible-core 2.19 or newer.
+Requires ansible-core 2.19 or newer on Python 3.11 or newer, and nomadpy
+0.2.0 or newer with its `exec` extra.
 
 ```
 ansible-galaxy collection install benemon.nomad
@@ -46,6 +47,7 @@ pip install -r ~/.ansible/collections/ansible_collections/benemon/nomad/requirem
 | `nomad_variable`, `nomad_variable_info` | Nomad variables |
 | `nomad_variable` (lookup) | Read a variable, or one of its items, inline |
 | `nomad` (inventory) | Client nodes, server members and running allocations as hosts |
+| `nomad_exec` (connection) | Run tasks inside a task of a running allocation over the exec API |
 | `nomad_acl_policy`, `nomad_acl_policy_info` | ACL policies |
 | `nomad_acl_role`, `nomad_acl_role_info` | ACL roles |
 | `nomad_acl_token`, `nomad_acl_token_info` | ACL tokens; the secret is returned once, at creation |
@@ -58,9 +60,10 @@ current value; a dict option that is set replaces the whole nested
 structure. Check mode and diff are supported throughout. Returned
 resources are the Nomad API documents, with the API's field names.
 
-The lookup and the inventory plugin do not see `module_defaults`. Pass
-`address` and `token` as keyword arguments or inventory file options, or set
-the environment variables.
+The lookup, the inventory plugin and the connection plugin do not see
+`module_defaults`. Pass `address` and `token` as keyword arguments, inventory
+file options or `ansible_nomad_*` host variables, or set the environment
+variables.
 
 ## Tests
 

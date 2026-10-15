@@ -1,1 +1,1 @@
-nomadpy>=0.1.0
+nomadpy[exec]>=0.2.0

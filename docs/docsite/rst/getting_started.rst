@@ -11,8 +11,9 @@ the API; nothing runs on the Nomad servers themselves.
 Install
 -------
 
-The collection requires ansible-core 2.19 or newer and nomadpy 0.1.0 or newer on
-the host that runs the plugins.
+The collection requires ansible-core 2.19 or newer, Python 3.11 or newer and
+nomadpy 0.2.0 or newer with its ``exec`` extra on the host that runs the
+plugins.
 
 .. code-block:: console
 
@@ -82,11 +83,12 @@ connection once with ``module_defaults``:
            name: web
            description: Web tier
 
-The :ansplugin:`benemon.nomad.nomad_variable#lookup` lookup and the
-:ansplugin:`benemon.nomad.nomad#inventory` inventory plugin are outside the
-action group and do not see ``module_defaults``. Pass their connection options
-as keyword arguments or inventory file options, or set the environment
-variables.
+The :ansplugin:`benemon.nomad.nomad_variable#lookup` lookup, the
+:ansplugin:`benemon.nomad.nomad#inventory` inventory plugin and the
+:ansplugin:`benemon.nomad.nomad_exec#connection` connection plugin are outside
+the action group and do not see ``module_defaults``. Pass their connection
+options as keyword arguments, inventory file options or ``ansible_nomad_*``
+host variables, or set the environment variables.
 
 How the modules behave
 ----------------------

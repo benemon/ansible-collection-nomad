@@ -1,0 +1,110 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: Register a job to run tasks in
+      benemon.nomad.nomad_job:
+        jobspec: |
+          job "exec" {
+            datacenters = ["dc1"]
+            type        = "service"
+            group "g" {
+              count = 1
+              update {
+                min_healthy_time = "1s"
+                healthy_deadline = "30s"
+              }
+              task "t" {
+                driver = "raw_exec"
+                config {
+                  command = "/bin/sh"
+                  args    = ["-c", "sleep 600"]
+                }
+                resources {
+                  cpu    = 10
+                  memory = 32
+                }
+              }
+            }
+          }
+
+    - name: The job's allocation
+      benemon.nomad.nomad_job_info:
+        name: exec
+      register: job
+
+    - name: A directory for files on the controller side
+      ansible.builtin.tempfile:
+        state: directory
+      register: workdir
+
+    - name: Add the allocation as a host
+      ansible.builtin.add_host:
+        name: exec-alloc
+        ansible_connection: benemon.nomad.nomad_exec
+        ansible_nomad_alloc_id: "{{ (lookup('ansible.builtin.url', nomad_address ~ '/v1/job/exec/allocations', headers={'X-Nomad-Token': nomad_token}) | from_json | selectattr('ClientStatus', 'eq', 'running') | first).ID }}"
+        ansible_nomad_task: t
+        ansible_nomad_address: "{{ nomad_address }}"
+        ansible_nomad_token: "{{ nomad_token }}"
+        ansible_nomad_timeout: 60
+        # raw_exec runs on the agent's host, so the controller's interpreter is in the task's view.
+        ansible_python_interpreter: "{{ ansible_playbook_python }}"
+        ansible_remote_tmp: "{{ workdir.path }}/remote"
+      changed_when: false
+
+    - name: Run a command in the task
+      ansible.builtin.command: sh -c 'echo "$NOMAD_ALLOC_ID"'
+      delegate_to: exec-alloc
+      register: inside
+      changed_when: false
+
+    - name: The command ran inside the allocation
+      ansible.builtin.assert:
+        that:
+          - inside.stdout == hostvars['exec-alloc'].ansible_nomad_alloc_id
+
+    - name: A failing command reports its exit code and stderr
+      ansible.builtin.command: sh -c 'echo nope >&2; exit 7'
+      delegate_to: exec-alloc
+      register: failing
+      failed_when: false
+      changed_when: false
+
+    - name: The exit code and stderr came through
+      ansible.builtin.assert:
+        that:
+          - failing.rc == 7
+          - failing.stderr == 'nope'
+
+    - name: Put a file into the task
+      ansible.builtin.copy:
+        content: "sent through the exec channel\n"
+        dest: "{{ workdir.path }}/sent.txt"
+        mode: "0644"
+      delegate_to: exec-alloc
+
+    - name: Fetch it back
+      ansible.builtin.fetch:
+        src: "{{ workdir.path }}/sent.txt"
+        dest: "{{ workdir.path }}/fetched/"
+        flat: true
+      delegate_to: exec-alloc
+
+    - name: The round trip preserved the content
+      ansible.builtin.assert:
+        that:
+          - lookup('ansible.builtin.file', workdir.path ~ '/fetched/sent.txt') == 'sent through the exec channel'
+  always:
+    - name: Stop and purge the job
+      benemon.nomad.nomad_job:
+        name: exec
+        state: absent
+        purge: true
+
+    - name: Remove the working directory
+      ansible.builtin.file:
+        path: "{{ workdir.path }}"
+        state: absent
+      when: workdir.path is defined

@@ -163,6 +163,11 @@ to ``*``, every namespace the token can read.
 An allocation whose address is not found by the chosen strategy is still a
 host, without ``ansible_host``.
 
+Every allocation host also carries ``ansible_nomad_alloc_id`` and
+``ansible_nomad_namespace``, and ``ansible_nomad_task`` when its task group
+has one task, so :ref:`ansible_collections.benemon.nomad.docsite.exec` works
+on it without further variables.
+
 Node detail
 -----------
 
