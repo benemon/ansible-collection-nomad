@@ -19,14 +19,14 @@ options:
   alloc_id:
     description:
       - ID of the allocation, in full.
-      - The M(benemon.nomad.nomad) inventory plugin sets it on allocation hosts.
+      - The P(benemon.nomad.nomad#inventory) inventory plugin sets it on allocation hosts.
     type: str
     vars:
       - name: ansible_nomad_alloc_id
   task:
     description:
       - Name of the task to run in.
-      - The M(benemon.nomad.nomad) inventory plugin sets it on allocation hosts whose task group has one task.
+      - The P(benemon.nomad.nomad#inventory) inventory plugin sets it on allocation hosts whose task group has one task.
     type: str
     vars:
       - name: ansible_nomad_task

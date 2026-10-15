@@ -9,7 +9,7 @@ version_added: 0.2.0
 description:
   - Lists the client nodes of a Nomad cluster as hosts, and on request its server members and running allocations.
   - Host variables are the Nomad API documents with the API's field names.
-  - Allocation hosts also carry what the M(benemon.nomad.nomad_exec) connection plugin needs.
+  - Allocation hosts also carry what the P(benemon.nomad.nomad_exec#connection) connection plugin needs.
   - Reads a YAML configuration file whose name ends in C(nomad.yml) or C(nomad.yaml).
 options:
   plugin:
