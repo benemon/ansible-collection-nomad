@@ -183,8 +183,8 @@ as <code class="docutils literal notranslate"><span class="pre">ansible_nomad_ad
 same environment fallbacks; see
 <a class="reference internal" href="getting_started.html#ansible-collections-benemon-nomad-docsite-getting-started"><span class="std std-ref">Getting started</span></a>.</p>
 <p>The <a class="reference internal" href="../nomad_inventory.html#ansible-collections-benemon-nomad-nomad-inventory"><span class="std std-ref">benemon.nomad.nomad</span></a> inventory plugin sets the
-allocation ID and namespace on every allocation host, and the task when the
-task group has one, so a play over its hosts needs only the connection:</p>
+allocation ID and namespace on every allocation host, so a play over its
+hosts needs only the connection and the task name:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># allocations.nomad.yml</span>
 <span class="nt">plugin</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">benemon.nomad.nomad</span>
 <span class="nt">clients</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
@@ -193,12 +193,17 @@ task group has one, so a play over its hosts needs only the connection:</p>
 </div>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nomad_job_web</span>
 <span class="w">  </span><span class="nt">connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">benemon.nomad.nomad_exec</span>
+<span class="w">  </span><span class="nt">vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">ansible_nomad_task</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
 <span class="w">  </span><span class="nt">tasks</span><span class="p">:</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ansible.builtin.command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cat /etc/hostname</span>
 </pre></div>
 </div>
-<p>A group with several tasks gets <code class="docutils literal notranslate"><span class="pre">ansible_nomad_task</span></code> from the play or the
-inventory’s <code class="docutils literal notranslate"><span class="pre">compose</span></code>.</p>
+<p>An inventory whose groups each run one task can compose the name instead:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">compose</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ansible_nomad_task</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nomad_allocation.TaskStates | first</span>
+</pre></div>
+</div>
 </section>
 <section id="what-the-task-needs">
 <h2>What the task needs<a class="headerlink" href="#what-the-task-needs" title="Link to this heading"></a></h2>
