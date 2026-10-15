@@ -8,6 +8,8 @@ action_groups:
     - nomad_acl_role_info
     - nomad_acl_token
     - nomad_acl_token_info
+    - nomad_allocation
+    - nomad_allocation_info
     - nomad_job
     - nomad_job_info
     - nomad_namespace

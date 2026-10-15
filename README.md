@@ -44,6 +44,7 @@ pip install -r ~/.ansible/collections/ansible_collections/benemon/nomad/requirem
 | `nomad_namespace`, `nomad_namespace_info` | Namespaces, including the Enterprise quota and cluster configuration fields |
 | `nomad_node_pool`, `nomad_node_pool_info` | Node pools, including the Enterprise scheduler configuration |
 | `nomad_node`, `nomad_node_info` | Node eligibility and drains, waiting for a drain to finish by default |
+| `nomad_allocation`, `nomad_allocation_info` | Restart, signal or stop an allocation; read allocations and task logs |
 | `nomad_variable`, `nomad_variable_info` | Nomad variables |
 | `nomad_variable` (lookup) | Read a variable, or one of its items, inline |
 | `nomad` (inventory) | Client nodes, server members and running allocations as hosts |

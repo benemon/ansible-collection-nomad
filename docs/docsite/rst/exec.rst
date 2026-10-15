@@ -83,3 +83,32 @@ connection to open and for each frame of output. Unset, a wait has no bound.
 
 The ACL policy of the token needs ``alloc-exec`` on the namespace, and
 ``alloc-node-exec`` as well for tasks on the ``raw_exec`` driver.
+
+Acting on an allocation from outside
+------------------------------------
+
+What Nomad can do to an allocation without a command running inside it is
+restart, signal and stop, and reading its logs.
+:ansplugin:`benemon.nomad.nomad_allocation#module` does the first three
+over the API, and :ansplugin:`benemon.nomad.nomad_allocation_info#module`
+reads allocations by ID, job or node and returns a task's stdout or stderr.
+
+.. code-block:: yaml
+
+   - name: The job's allocations
+     benemon.nomad.nomad_allocation_info:
+       job: web
+     register: web
+
+   - name: Reload the web task of each one
+     benemon.nomad.nomad_allocation:
+       alloc_id: "{{ item.ID }}"
+       task: web
+       signal: SIGHUP
+     loop: "{{ web.allocations }}"
+     loop_control:
+       label: "{{ item.Name }}"
+
+A restart and a signal always act and always report a change; a stop acts
+only on an allocation that is still running, and waits for it to finish by
+default.
