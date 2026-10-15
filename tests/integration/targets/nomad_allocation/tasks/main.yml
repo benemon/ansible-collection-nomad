@@ -1,0 +1,128 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: Register a job whose task logs a line and sleeps
+      benemon.nomad.nomad_job:
+        jobspec: |
+          job "alloc" {
+            datacenters = ["dc1"]
+            type        = "service"
+            group "g" {
+              count = 1
+              update {
+                min_healthy_time = "1s"
+                healthy_deadline = "30s"
+              }
+              task "t" {
+                driver = "raw_exec"
+                config {
+                  command = "/bin/sh"
+                  args    = ["-c", "echo started; echo warn >&2; sleep 600"]
+                }
+                resources {
+                  cpu    = 10
+                  memory = 32
+                }
+              }
+            }
+          }
+
+    - name: The job's allocations
+      benemon.nomad.nomad_allocation_info:
+        job: alloc
+      register: listed
+
+    - name: One running allocation, as a stub
+      ansible.builtin.assert:
+        that:
+          - listed.allocations | length == 1
+          - listed.allocations[0].ClientStatus == 'running'
+          - "'TaskStates' in listed.allocations[0]"
+          - "'Job' not in listed.allocations[0]"
+
+    - name: The allocation in full, with its task's logs
+      benemon.nomad.nomad_allocation_info:
+        alloc_id: "{{ listed.allocations[0].ID }}"
+        task: t
+      register: one
+
+    - name: Its stderr
+      benemon.nomad.nomad_allocation_info:
+        alloc_id: "{{ listed.allocations[0].ID }}"
+        task: t
+        log_type: stderr
+      register: err
+
+    - name: The full document and both logs came back
+      ansible.builtin.assert:
+        that:
+          - one.allocations[0].ID == listed.allocations[0].ID
+          - "'Job' in one.allocations[0]"
+          - one.logs == 'started\n'
+          - err.logs == 'warn\n'
+
+    - name: Restart the task
+      benemon.nomad.nomad_allocation:
+        alloc_id: "{{ listed.allocations[0].ID }}"
+        restart: true
+        task: t
+      register: restarted
+
+    - name: Signal the task
+      benemon.nomad.nomad_allocation:
+        alloc_id: "{{ listed.allocations[0].ID }}"
+        task: t
+        signal: SIGCONT
+      register: signalled
+
+    - name: Stop it, in check mode
+      benemon.nomad.nomad_allocation:
+        alloc_id: "{{ listed.allocations[0].ID }}"
+        state: absent
+      check_mode: true
+      register: checked
+
+    - name: Stop it and wait
+      benemon.nomad.nomad_allocation:
+        alloc_id: "{{ listed.allocations[0].ID }}"
+        state: absent
+      register: stopped
+
+    - name: Stop it again
+      benemon.nomad.nomad_allocation:
+        alloc_id: "{{ listed.allocations[0].ID }}"
+        state: absent
+      register: stopped_again
+
+    - name: Stop an allocation that does not exist
+      benemon.nomad.nomad_allocation:
+        alloc_id: 00000000-0000-0000-0000-000000000000
+        state: absent
+      register: missing
+
+    - name: Each action reported as documented
+      ansible.builtin.assert:
+        that:
+          - restarted.changed and restarted.allocation.ID == listed.allocations[0].ID
+          - signalled.changed
+          - checked.changed and checked.allocation.ClientStatus == 'running'
+          - stopped.changed and stopped.eval_id is string and stopped.allocation.ClientStatus in ['complete', 'failed', 'lost']
+          - not stopped_again.changed
+          - not missing.changed and missing.allocation is none
+
+    - name: A missing allocation reads as an empty list
+      benemon.nomad.nomad_allocation_info:
+        alloc_id: 00000000-0000-0000-0000-000000000000
+      register: none_found
+
+    - ansible.builtin.assert:
+        that: none_found.allocations == []
+  always:
+    - name: Stop and purge the job
+      benemon.nomad.nomad_job:
+        name: alloc
+        state: absent
+        purge: true
