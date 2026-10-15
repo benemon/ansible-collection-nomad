@@ -9,6 +9,7 @@ version_added: 0.2.0
 description:
   - Lists the client nodes of a Nomad cluster as hosts, and on request its server members and running allocations.
   - Host variables are the Nomad API documents with the API's field names.
+  - Allocation hosts also carry what the M(benemon.nomad.nomad_exec) connection plugin needs.
   - Reads a YAML configuration file whose name ends in C(nomad.yml) or C(nomad.yaml).
 options:
   plugin:
@@ -201,7 +202,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             for alloc in payload["allocations"]:
                 name = alloc["Namespace"] + "." + INDEX.sub(r".\1", alloc["Name"])
                 groups = ["nomad_allocations", "nomad_namespace_" + alloc["Namespace"], "nomad_job_" + alloc["JobID"]]
-                hostvars = {"nomad_allocation": alloc, **_allocation_address(alloc, strategy, payload, node_address)}
+                hostvars = {"nomad_allocation": alloc, "ansible_nomad_alloc_id": alloc["ID"], "ansible_nomad_namespace": alloc["Namespace"]}
+                tasks = list(alloc["TaskStates"] or {})
+                if len(tasks) == 1:
+                    hostvars["ansible_nomad_task"] = tasks[0]
+                hostvars.update(_allocation_address(alloc, strategy, payload, node_address))
                 self._add(name, groups, hostvars, strict)
 
     def _add(self, host, groups, hostvars, strict):

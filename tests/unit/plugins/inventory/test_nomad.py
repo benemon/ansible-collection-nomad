@@ -12,6 +12,7 @@ from nomadpy import (
     AllocatedSharedResources,
     AllocationListStub,
     DriverInfo,
+    TaskState,
     Job,
     Node,
     NodeListStub,
@@ -34,6 +35,7 @@ MEMBER = AgentMember(name="server1.global", addr="10.0.0.1", port=4648, tags={"d
 RUNNING = AllocationListStub(
     id="a1", name="web.web[0]", namespace="default", node_id="n1", job_id="web", task_group="web", client_status="running",
     allocated_resources=AllocatedResources(shared=AllocatedSharedResources(networks=[{"IP": "172.26.64.3", "Mode": "bridge"}])),
+    task_states={"web": TaskState(state="running")},
 )
 STOPPED = AllocationListStub(id="a2", name="web.web[1]", namespace="default", node_id="n1", job_id="web", task_group="web", client_status="complete")
 
@@ -104,6 +106,8 @@ def test_allocations_at_node_address(tmp_path):
     assert hosts_of(inventory, "nomad_allocations") == ["default.web.web.0"]
     host = inventory.get_host("default.web.web.0")
     assert host.vars["ansible_host"] == "10.0.0.5" and host.vars["nomad_allocation"]["ID"] == "a1"
+    assert host.vars["ansible_nomad_alloc_id"] == "a1" and host.vars["ansible_nomad_namespace"] == "default"
+    assert host.vars["ansible_nomad_task"] == "web"
     assert hosts_of(inventory, "nomad_namespace_default") == ["default.web.web.0"]
     assert hosts_of(inventory, "nomad_job_web") == ["default.web.web.0"]
     q = client.allocations.list.call_args.args[0]
@@ -153,6 +157,7 @@ def test_meta_address(tmp_path):
     inventory = run(tmp_path, client, allocations=True, allocation_address="meta:ansible_host")[0]
     assert inventory.get_host("default.web.web.0").vars["ansible_host"] == "task.example"
     assert inventory.get_host("default.web.api.0").vars["ansible_host"] == "job.example"
+    assert "ansible_nomad_task" not in inventory.get_host("default.web.api.0").vars  # no task states on the stub
     client.jobs.info.assert_called_once()
     assert client.jobs.info.call_args.args[0] == "web" and client.jobs.info.call_args.args[1].namespace == "default"
 

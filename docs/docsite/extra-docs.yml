@@ -6,6 +6,7 @@ sections:
       - jobs
       - secrets
       - inventory
+      - exec
       - enterprise
       - examples
       - contributing

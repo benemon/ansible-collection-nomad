@@ -50,7 +50,7 @@ options:
       - Falls back to E(NOMAD_SKIP_VERIFY).
     type: bool
 requirements:
-  - nomadpy >= 0.1.0
+  - nomadpy >= 0.2.0
 notes:
   - Connection options fall back to the environment variables the Nomad CLI reads, with the same meaning.
   - Enterprise features are not checked client-side. On a Community server the request fails with the server's own error.
