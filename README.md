@@ -45,6 +45,7 @@ pip install -r ~/.ansible/collections/ansible_collections/benemon/nomad/requirem
 | `nomad_node`, `nomad_node_info` | Node eligibility and drains, waiting for a drain to finish by default |
 | `nomad_variable`, `nomad_variable_info` | Nomad variables |
 | `nomad_variable` (lookup) | Read a variable, or one of its items, inline |
+| `nomad` (inventory) | Client nodes, server members and running allocations as hosts |
 | `nomad_acl_policy`, `nomad_acl_policy_info` | ACL policies |
 | `nomad_acl_role`, `nomad_acl_role_info` | ACL roles |
 | `nomad_acl_token`, `nomad_acl_token_info` | ACL tokens; the secret is returned once, at creation |
@@ -57,8 +58,9 @@ current value; a dict option that is set replaces the whole nested
 structure. Check mode and diff are supported throughout. Returned
 resources are the Nomad API documents, with the API's field names.
 
-The lookup does not see `module_defaults`. Pass `address` and `token` as
-keyword arguments or set the environment variables.
+The lookup and the inventory plugin do not see `module_defaults`. Pass
+`address` and `token` as keyword arguments or inventory file options, or set
+the environment variables.
 
 ## Tests
 

@@ -5,6 +5,7 @@ sections:
       - getting_started
       - jobs
       - secrets
+      - inventory
       - enterprise
       - examples
       - contributing
