@@ -82,9 +82,11 @@ connection once with ``module_defaults``:
            name: web
            description: Web tier
 
-The :ansplugin:`benemon.nomad.nomad_variable#lookup` lookup is outside the
-action group and does not see ``module_defaults``. Pass its connection options
-as keyword arguments or set the environment variables.
+The :ansplugin:`benemon.nomad.nomad_variable#lookup` lookup and the
+:ansplugin:`benemon.nomad.nomad#inventory` inventory plugin are outside the
+action group and do not see ``module_defaults``. Pass their connection options
+as keyword arguments or inventory file options, or set the environment
+variables.
 
 How the modules behave
 ----------------------

@@ -1,0 +1,169 @@
+- name: Inventory from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  vars:
+    # ansible-inventory runs as a separate process, so the collection is found through the path ansible-test exports.
+    collections_path: "{{ lookup('ansible.builtin.env', 'ANSIBLE_COLLECTIONS_PATH') }}"
+    connection:
+      plugin: benemon.nomad.nomad
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+    configs:
+      base:
+        servers: true
+        allocations: true
+      service:
+        allocations: true
+        allocation_address: service:inv-ssh
+      meta:
+        allocations: true
+        allocation_address: meta:ansible_host
+      network:
+        allocations: true
+        allocation_address: network
+      detail:
+        node_detail: true
+        keyed_groups:
+          - key: nomad_node.Datacenter
+            prefix: dc
+        compose:
+          nomad_version: nomad_node.Attributes['nomad.version']
+  block:
+    - name: Register a job with a service, a port and meta at two levels
+      benemon.nomad.nomad_job:
+        jobspec: |
+          job "inv" {
+            datacenters = ["dc1"]
+            type        = "service"
+            meta {
+              ansible_host = "10.0.0.1"
+            }
+            group "g" {
+              count = 1
+              meta {
+                ansible_host = "10.0.0.9"
+              }
+              network {
+                port "ssh" {}
+              }
+              service {
+                name     = "inv-ssh"
+                port     = "ssh"
+                provider = "nomad"
+              }
+              update {
+                min_healthy_time = "1s"
+                healthy_deadline = "30s"
+              }
+              task "t" {
+                driver = "raw_exec"
+                config {
+                  command = "/bin/sh"
+                  args    = ["-c", "sleep 600"]
+                }
+                resources {
+                  cpu    = 10
+                  memory = 32
+                }
+              }
+            }
+          }
+
+    - name: The dev agent's client node
+      benemon.nomad.nomad_node_info:
+      register: nodes
+
+    - name: A directory for the inventory files
+      ansible.builtin.tempfile:
+        state: directory
+      register: workdir
+
+    - name: Write the inventory files
+      ansible.builtin.copy:
+        content: "{{ connection | combine(item.value) | to_nice_yaml }}"
+        dest: "{{ workdir.path }}/{{ item.key }}.nomad.yml"
+        mode: "0600"
+      loop: "{{ configs | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Read each inventory
+      ansible.builtin.command:
+        cmd: ansible-inventory -i {{ workdir.path }}/{{ item }}.nomad.yml --list
+      environment:
+        ANSIBLE_COLLECTIONS_PATH: "{{ collections_path }}"
+      loop: "{{ configs.keys() | list }}"
+      register: listed
+      changed_when: false
+
+    - name: Parse them
+      ansible.builtin.set_fact:
+        inventories: "{{ dict(configs.keys() | zip(listed.results | map(attribute='stdout') | map('from_json', profile='inventory_legacy'))) }}"
+        node_name: "{{ nodes.nodes[0].Name }}"
+        node_address: "{{ nodes.nodes[0].Address }}"
+
+    - name: The client node is a host in its groups
+      ansible.builtin.assert:
+        that:
+          - inventories.base.nomad_clients.hosts == [node_name]
+          - inventories.base.nomad_datacenter_dc1.hosts is contains(node_name)
+          - inventories.base.nomad_driver_raw_exec.hosts == [node_name]
+          - inventories.base.nomad_status_ready.hosts == [node_name]
+          - inventories.base.nomad_eligibility_eligible.hosts == [node_name]
+          - inventories.base._meta.hostvars[node_name].ansible_host == node_address
+          - inventories.base._meta.hostvars[node_name].nomad_node.ID == nodes.nodes[0].ID
+          - "'Meta' not in inventories.base._meta.hostvars[node_name].nomad_node"
+
+    - name: The server member is a host
+      ansible.builtin.assert:
+        that:
+          - inventories.base.nomad_servers.hosts | length == 1
+          - inventories.base._meta.hostvars[inventories.base.nomad_servers.hosts[0]].ansible_host is string
+          - inventories.base._meta.hostvars[inventories.base.nomad_servers.hosts[0]].nomad_member.Tags.role == 'nomad'
+
+    - name: The allocation is a host at the node's address
+      ansible.builtin.assert:
+        that:
+          - inventories.base.nomad_allocations.hosts == ['default.inv.g.0']
+          - inventories.base.nomad_job_inv.hosts == ['default.inv.g.0']
+          - inventories.base.nomad_namespace_default.hosts == ['default.inv.g.0']
+          - inventories.base._meta.hostvars['default.inv.g.0'].ansible_host == node_address
+          - inventories.base._meta.hostvars['default.inv.g.0'].nomad_allocation.JobID == 'inv'
+
+    - name: The service registration gives the address and port
+      ansible.builtin.assert:
+        that:
+          - inventories.service._meta.hostvars['default.inv.g.0'].ansible_host is string
+          - inventories.service._meta.hostvars['default.inv.g.0'].ansible_port is integer
+          - inventories.service._meta.hostvars['default.inv.g.0'].ansible_port > 0
+
+    - name: The group meta wins over the job meta
+      ansible.builtin.assert:
+        that:
+          - inventories.meta._meta.hostvars['default.inv.g.0'].ansible_host == '10.0.0.9'
+
+    - name: The network address is the allocation's first network
+      ansible.builtin.assert:
+        that:
+          - inventories.network._meta.hostvars['default.inv.g.0'].ansible_host == inventories.network._meta.hostvars['default.inv.g.0'].nomad_allocation.AllocatedResources.Shared.Networks[0].IP
+
+    - name: Node detail and the constructed options
+      ansible.builtin.assert:
+        that:
+          - inventories.detail._meta.hostvars[node_name].nomad_node.Attributes is mapping
+          - inventories.detail._meta.hostvars[node_name].nomad_version == nodes.nodes[0].Version
+          - inventories.detail.dc_dc1.hosts == [node_name]
+  always:
+    - name: Stop and purge the job
+      benemon.nomad.nomad_job:
+        name: inv
+        state: absent
+        purge: true
+
+    - name: Remove the inventory files
+      ansible.builtin.file:
+        path: "{{ workdir.path }}"
+        state: absent
+      when: workdir.path is defined
