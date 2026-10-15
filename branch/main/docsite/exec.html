@@ -80,6 +80,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Running tasks inside allocations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#hosts">Hosts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-the-task-needs">What the task needs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#acting-on-an-allocation-from-outside">Acting on an allocation from outside</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="enterprise.html">Enterprise behaviour</a></li>
@@ -93,6 +94,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../nomad_acl_role_info_module.html">benemon.nomad.nomad_acl_role_info module – Read Nomad ACL roles</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_module.html">benemon.nomad.nomad_acl_token module – Manage a Nomad ACL token</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_acl_token_info_module.html">benemon.nomad.nomad_acl_token_info module – Read Nomad ACL tokens</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_allocation_module.html">benemon.nomad.nomad_allocation module – Restart, signal or stop a Nomad allocation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_allocation_info_module.html">benemon.nomad.nomad_allocation_info module – Read Nomad allocations and their task logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_job_module.html">benemon.nomad.nomad_job module – Register or stop a Nomad job</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_job_info_module.html">benemon.nomad.nomad_job_info module – Read Nomad jobs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_namespace_module.html">benemon.nomad.nomad_namespace module – Manage a Nomad namespace</a></li>
@@ -218,6 +221,32 @@ not.</p>
 connection to open and for each frame of output. Unset, a wait has no bound.</p>
 <p>The ACL policy of the token needs <code class="docutils literal notranslate"><span class="pre">alloc-exec</span></code> on the namespace, and
 <code class="docutils literal notranslate"><span class="pre">alloc-node-exec</span></code> as well for tasks on the <code class="docutils literal notranslate"><span class="pre">raw_exec</span></code> driver.</p>
+</section>
+<section id="acting-on-an-allocation-from-outside">
+<h2>Acting on an allocation from outside<a class="headerlink" href="#acting-on-an-allocation-from-outside" title="Link to this heading"></a></h2>
+<p>What Nomad can do to an allocation without a command running inside it is
+restart, signal and stop, and reading its logs.
+<a class="reference internal" href="../nomad_allocation_module.html#ansible-collections-benemon-nomad-nomad-allocation-module"><span class="std std-ref">benemon.nomad.nomad_allocation</span></a> does the first three
+over the API, and <a class="reference internal" href="../nomad_allocation_info_module.html#ansible-collections-benemon-nomad-nomad-allocation-info-module"><span class="std std-ref">benemon.nomad.nomad_allocation_info</span></a>
+reads allocations by ID, job or node and returns a task’s stdout or stderr.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The job's allocations</span>
+<span class="w">  </span><span class="nt">benemon.nomad.nomad_allocation_info</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">job</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Reload the web task of each one</span>
+<span class="w">  </span><span class="nt">benemon.nomad.nomad_allocation</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">alloc_id</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">item.ID</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">task</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">    </span><span class="nt">signal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SIGHUP</span>
+<span class="w">  </span><span class="nt">loop</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">web.allocations</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">  </span><span class="nt">loop_control</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">item.Name</span><span class="nv"> </span><span class="s">}}"</span>
+</pre></div>
+</div>
+<p>A restart and a signal always act and always report a change; a stop acts
+only on an allocation that is still running, and waits for it to finish by
+default.</p>
 </section>
 </section>
 
