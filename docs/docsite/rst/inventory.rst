@@ -28,7 +28,8 @@ Host variables
 --------------
 
 Each host carries the Nomad API document it was built from, with the API's
-field names:
+field names, and with it every address the API attaches to that host. The
+plugin sets ``ansible_host`` only where the API gives one address.
 
 .. list-table::
    :header-rows: 1
@@ -36,7 +37,7 @@ field names:
    * - Host
      - Name
      - ``ansible_host``
-     - Variable
+     - Variables
    * - Client node
      - the node's ``Name``
      - the node's ``Address``
@@ -46,9 +47,9 @@ field names:
      - the member's ``Addr``
      - ``nomad_member``, the `agent members <https://developer.hashicorp.com/nomad/api-docs/agent#list-members>`_ entry
    * - Allocation
-     - see below
-     - chosen by ``allocation_address``
-     - ``nomad_allocation``, the `allocation list <https://developer.hashicorp.com/nomad/api-docs/allocations#list-allocations>`_ stub with ``AllocatedResources``
+     - ``<namespace>.<job>.<group>.<index>``
+     - not set; see below
+     - ``nomad_allocation``, the `allocation list <https://developer.hashicorp.com/nomad/api-docs/allocations#list-allocations>`_ stub with ``AllocatedResources``; ``ansible_nomad_alloc_id`` and ``ansible_nomad_namespace``; ``nomad_services`` with ``services: true``
 
 Groups
 ------
@@ -101,72 +102,72 @@ variables:
 Allocation hosts
 ----------------
 
-With ``allocations: true`` every running allocation is a host. Task drivers
-such as QEMU run guests that Ansible reaches directly, so an allocation host
-needs an address; ``allocation_address`` says where it comes from.
+With ``allocations: true`` every running allocation is a host, named
+``<namespace>.<job>.<group>.<index>``: allocation ``web.web[0]`` in the
+``default`` namespace is the host ``default.web.web.0``. The API's own
+allocation name contains ``[0]``, which an Ansible host pattern reads as a
+group slice, and names repeat across namespaces. ``namespace`` selects the
+namespace whose allocations are listed and defaults to ``*``, every namespace
+the token can read.
 
-The host name is ``<namespace>.<job>.<group>.<index>``: allocation
-``web.web[0]`` in the ``default`` namespace is the host ``default.web.web.0``.
-The API's own allocation name contains ``[0]``, which an Ansible host pattern
-reads as a group slice, and names repeat across namespaces.
+An allocation has several addresses, and which one reaches it depends on the
+task driver and the network mode, so the plugin sets none. The document
+carries them all:
 
-``namespace`` selects the namespace whose allocations are listed and defaults
-to ``*``, every namespace the token can read.
+.. list-table::
+   :header-rows: 1
 
-``node``
-   The default. The address of the node the allocation runs on. Right for
-   tasks that share the node's network, and the only strategy that needs no
-   more than the node and allocation lists.
+   * - Address
+     - Where it is
+     - Reaches
+   * - host-mapped port
+     - ``nomad_allocation.AllocatedResources.Shared.Ports``, each with ``Label``, ``HostIP`` and ``Value``
+     - a port the task exposes on the node, such as a guest's SSH
+   * - bridge address
+     - ``nomad_allocation.AllocatedResources.Shared.Networks[].IP``
+     - the task's own address in ``bridge`` or CNI network mode, from the node
+   * - node
+     - ``nomad_allocation.NodeName``, the host of the same name in ``nomad_clients``
+     - a task in ``host`` network mode
+   * - service registration
+     - ``nomad_services``, with ``services: true``
+     - the ``Address`` and ``Port`` the task registered as a `Nomad service <https://developer.hashicorp.com/nomad/docs/job-specification/service>`_
 
-   .. code-block:: yaml
+``compose`` chooses. A fleet of virtual machines whose groups label their SSH
+port ``ssh``:
 
-      plugin: benemon.nomad.nomad
-      allocations: true
+.. code-block:: yaml
 
-``network``
-   The ``IP`` of the first network in the allocation's ``AllocatedResources``:
-   the bridge or CNI address of a group with a ``network`` block in a mode
-   other than ``host``.
+   plugin: benemon.nomad.nomad
+   clients: false
+   allocations: true
+   namespace: vms
+   compose:
+     ansible_host: (nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).HostIP
+     ansible_port: (nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).Value
 
-   .. code-block:: yaml
+The same fleet reached at the address each guest registered as the service
+``ssh``:
 
-      plugin: benemon.nomad.nomad
-      allocations: true
-      allocation_address: network
+.. code-block:: yaml
 
-``service:<name>``
-   The ``Address`` and ``Port`` the allocation registered for the named
-   `Nomad service <https://developer.hashicorp.com/nomad/docs/job-specification/service>`_
-   (``provider = "nomad"``). ``ansible_port`` is set as well. A guest that
-   registers its SSH port as a service is reached at that port.
+   plugin: benemon.nomad.nomad
+   clients: false
+   allocations: true
+   services: true
+   compose:
+     ansible_host: (nomad_services | selectattr('ServiceName', 'eq', 'ssh') | first).Address
+     ansible_port: (nomad_services | selectattr('ServiceName', 'eq', 'ssh') | first).Port
 
-   .. code-block:: yaml
+``services: true`` reads the service registrations of the listed namespaces,
+one request per service name, and ``nomad_services`` is the list of
+registrations the allocation made, empty when it made none.
 
-      plugin: benemon.nomad.nomad
-      clients: false
-      allocations: true
-      namespace: vms
-      allocation_address: service:ssh
-
-``meta:<key>``
-   The value of the key in the job's
-   `meta <https://developer.hashicorp.com/nomad/docs/job-specification/meta>`_,
-   looking first at the tasks of the allocation's task group, then at the task
-   group, then at the job. One job read per job with running allocations.
-
-   .. code-block:: yaml
-
-      plugin: benemon.nomad.nomad
-      allocations: true
-      allocation_address: meta:ansible_host
-
-An allocation whose address is not found by the chosen strategy is still a
-host, without ``ansible_host``.
-
-Every allocation host also carries ``ansible_nomad_alloc_id`` and
-``ansible_nomad_namespace``, and ``ansible_nomad_task`` when its task group
-has one task, so :ref:`ansible_collections.benemon.nomad.docsite.exec` works
-on it without further variables.
+A task with no address of its own, in a container or a chroot, is reached
+through :ref:`ansible_collections.benemon.nomad.docsite.exec` instead. Every
+allocation host carries the ``ansible_nomad_alloc_id`` and
+``ansible_nomad_namespace`` that connection needs; the task name is set in
+the play or composed from ``nomad_allocation.TaskStates``.
 
 Node detail
 -----------

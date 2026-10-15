@@ -40,8 +40,8 @@ same environment fallbacks; see
 :ref:`ansible_collections.benemon.nomad.docsite.getting_started`.
 
 The :ansplugin:`benemon.nomad.nomad#inventory` inventory plugin sets the
-allocation ID and namespace on every allocation host, and the task when the
-task group has one, so a play over its hosts needs only the connection:
+allocation ID and namespace on every allocation host, so a play over its
+hosts needs only the connection and the task name:
 
 .. code-block:: yaml
 
@@ -54,11 +54,17 @@ task group has one, so a play over its hosts needs only the connection:
 
    - hosts: nomad_job_web
      connection: benemon.nomad.nomad_exec
+     vars:
+       ansible_nomad_task: web
      tasks:
        - ansible.builtin.command: cat /etc/hostname
 
-A group with several tasks gets ``ansible_nomad_task`` from the play or the
-inventory's ``compose``.
+An inventory whose groups each run one task can compose the name instead:
+
+.. code-block:: yaml
+
+   compose:
+     ansible_nomad_task: nomad_allocation.TaskStates | first
 
 What the task needs
 -------------------

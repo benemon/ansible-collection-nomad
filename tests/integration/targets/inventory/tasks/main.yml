@@ -14,15 +14,19 @@
       base:
         servers: true
         allocations: true
-      service:
+      services:
+        clients: false
         allocations: true
-        allocation_address: service:inv-ssh
-      meta:
+        services: true
+        compose:
+          ansible_host: (nomad_services | selectattr('ServiceName', 'eq', 'inv-ssh') | first).Address
+          ansible_port: (nomad_services | selectattr('ServiceName', 'eq', 'inv-ssh') | first).Port
+      ports:
+        clients: false
         allocations: true
-        allocation_address: meta:ansible_host
-      network:
-        allocations: true
-        allocation_address: network
+        compose:
+          ansible_host: (nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).HostIP
+          ansible_port: (nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).Value
       detail:
         node_detail: true
         keyed_groups:
@@ -31,20 +35,14 @@
         compose:
           nomad_version: nomad_node.Attributes['nomad.version']
   block:
-    - name: Register a job with a service, a port and meta at two levels
+    - name: Register a job with a labelled port and a service on it
       benemon.nomad.nomad_job:
         jobspec: |
           job "inv" {
             datacenters = ["dc1"]
             type        = "service"
-            meta {
-              ansible_host = "10.0.0.1"
-            }
             group "g" {
               count = 1
-              meta {
-                ansible_host = "10.0.0.9"
-              }
               network {
                 port "ssh" {}
               }
@@ -123,31 +121,40 @@
           - inventories.base._meta.hostvars[inventories.base.nomad_servers.hosts[0]].ansible_host is string
           - inventories.base._meta.hostvars[inventories.base.nomad_servers.hosts[0]].nomad_member.Tags.role == 'nomad'
 
-    - name: The allocation is a host at the node's address
+    - name: The allocation is a host carrying its document and the exec variables, with no address chosen
       ansible.builtin.assert:
         that:
           - inventories.base.nomad_allocations.hosts == ['default.inv.g.0']
           - inventories.base.nomad_job_inv.hosts == ['default.inv.g.0']
           - inventories.base.nomad_namespace_default.hosts == ['default.inv.g.0']
-          - inventories.base._meta.hostvars['default.inv.g.0'].ansible_host == node_address
-          - inventories.base._meta.hostvars['default.inv.g.0'].nomad_allocation.JobID == 'inv'
+          - "'ansible_host' not in alloc"
+          - alloc.ansible_nomad_alloc_id == alloc.nomad_allocation.ID
+          - alloc.ansible_nomad_namespace == 'default'
+          - alloc.nomad_allocation.JobID == 'inv'
+          - alloc.nomad_allocation.NodeName == node_name
+          - (alloc.nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).Value > 0
+      vars:
+        alloc: "{{ inventories.base._meta.hostvars['default.inv.g.0'] }}"
 
-    - name: The service registration gives the address and port
+    - name: Composing the address from the host-mapped port
       ansible.builtin.assert:
         that:
-          - inventories.service._meta.hostvars['default.inv.g.0'].ansible_host is string
-          - inventories.service._meta.hostvars['default.inv.g.0'].ansible_port is integer
-          - inventories.service._meta.hostvars['default.inv.g.0'].ansible_port > 0
+          - alloc.ansible_host is string
+          - alloc.ansible_port is integer
+          - alloc.ansible_port == (alloc.nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).Value
+      vars:
+        alloc: "{{ inventories.ports._meta.hostvars['default.inv.g.0'] }}"
 
-    - name: The group meta wins over the job meta
+    - name: The service registrations are on the host and compose the address
       ansible.builtin.assert:
         that:
-          - inventories.meta._meta.hostvars['default.inv.g.0'].ansible_host == '10.0.0.9'
-
-    - name: The network address is the allocation's first network
-      ansible.builtin.assert:
-        that:
-          - inventories.network._meta.hostvars['default.inv.g.0'].ansible_host == inventories.network._meta.hostvars['default.inv.g.0'].nomad_allocation.AllocatedResources.Shared.Networks[0].IP
+          - alloc.nomad_services | length == 1
+          - alloc.nomad_services[0].ServiceName == 'inv-ssh'
+          - alloc.nomad_services[0].AllocID == alloc.ansible_nomad_alloc_id
+          - alloc.ansible_host == alloc.nomad_services[0].Address
+          - alloc.ansible_port == alloc.nomad_services[0].Port
+      vars:
+        alloc: "{{ inventories.services._meta.hostvars['default.inv.g.0'] }}"
 
     - name: Node detail and the constructed options
       ansible.builtin.assert:
