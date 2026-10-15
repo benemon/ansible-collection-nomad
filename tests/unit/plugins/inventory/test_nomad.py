@@ -12,15 +12,15 @@ from nomadpy import (
     AllocatedSharedResources,
     AllocationListStub,
     DriverInfo,
-    TaskState,
-    Job,
     Node,
     NodeListStub,
+    PortMapping,
     QueryMeta,
     ServerMembers,
     ServiceRegistration,
-    Task,
-    TaskGroup,
+    ServiceRegistrationListStub,
+    ServiceRegistrationStub,
+    TaskState,
     UnexpectedResponseError,
 )
 
@@ -33,8 +33,10 @@ NODE = NodeListStub(
 )
 MEMBER = AgentMember(name="server1.global", addr="10.0.0.1", port=4648, tags={"dc": "dc1", "region": "global"}, status="alive")
 RUNNING = AllocationListStub(
-    id="a1", name="web.web[0]", namespace="default", node_id="n1", job_id="web", task_group="web", client_status="running",
-    allocated_resources=AllocatedResources(shared=AllocatedSharedResources(networks=[{"IP": "172.26.64.3", "Mode": "bridge"}])),
+    id="a1", name="web.web[0]", namespace="default", node_id="n1", node_name="node1", job_id="web", task_group="web", client_status="running",
+    allocated_resources=AllocatedResources(shared=AllocatedSharedResources(
+        networks=[{"IP": "172.26.64.3", "Mode": "bridge"}], ports=[PortMapping(label="ssh", value=20022, to=22, host_ip="10.0.0.5")],
+    )),
     task_states={"web": TaskState(state="running")},
 )
 STOPPED = AllocationListStub(id="a2", name="web.web[1]", namespace="default", node_id="n1", job_id="web", task_group="web", client_status="complete")
@@ -100,71 +102,56 @@ def test_servers(tmp_path):
     assert hosts_of(inventory, "nomad_datacenter_dc1") == ["node1", "server1.global"]
 
 
-def test_allocations_at_node_address(tmp_path):
+def test_allocations(tmp_path):
     client = client_with()
-    inventory = run(tmp_path, client, allocations=True)[0]
+    inventory = run(tmp_path, client, clients=False, allocations=True)[0]
     assert hosts_of(inventory, "nomad_allocations") == ["default.web.web.0"]
     host = inventory.get_host("default.web.web.0")
-    assert host.vars["ansible_host"] == "10.0.0.5" and host.vars["nomad_allocation"]["ID"] == "a1"
+    assert "ansible_host" not in host.vars
     assert host.vars["ansible_nomad_alloc_id"] == "a1" and host.vars["ansible_nomad_namespace"] == "default"
-    assert host.vars["ansible_nomad_task"] == "web"
+    assert "ansible_nomad_task" not in host.vars and "nomad_services" not in host.vars
+    ports = host.vars["nomad_allocation"]["AllocatedResources"]["Shared"]["Ports"]
+    assert ports == [{"Label": "ssh", "Value": 20022, "To": 22, "HostIP": "10.0.0.5"}]
+    assert host.vars["nomad_allocation"]["AllocatedResources"]["Shared"]["Networks"][0]["IP"] == "172.26.64.3"
     assert hosts_of(inventory, "nomad_namespace_default") == ["default.web.web.0"]
     assert hosts_of(inventory, "nomad_job_web") == ["default.web.web.0"]
     q = client.allocations.list.call_args.args[0]
     assert q.namespace == "*" and q.params == {"resources": "true"}
+    client.nodes.list.assert_not_called()
+    client.services.list.assert_not_called()
 
 
-def test_allocations_without_clients_still_read_the_nodes(tmp_path):
-    client = client_with()
-    inventory = run(tmp_path, client, clients=False, allocations=True)[0]
-    assert "nomad_clients" not in inventory.groups
-    assert inventory.get_host("default.web.web.0").vars["ansible_host"] == "10.0.0.5"
-    client.nodes.list.assert_called_once()
-
-
-def test_network_address(tmp_path):
-    client = client_with()
-    inventory = run(tmp_path, client, allocations=True, allocation_address="network")[0]
-    assert inventory.get_host("default.web.web.0").vars["ansible_host"] == "172.26.64.3"
-    client.nodes.list.assert_called_once()  # clients are on by default; the strategy itself does not read nodes
-
-
-def test_service_address(tmp_path):
-    client = client_with()
-    client.services.get.return_value = ([ServiceRegistration(id="r1", alloc_id="a1", address="192.0.2.8", port=2222)], QueryMeta())
-    inventory = run(tmp_path, client, allocations=True, allocation_address="service:ssh")[0]
+def test_address_chosen_by_compose(tmp_path):
+    inventory = run(tmp_path, client_with(), allocations=True, compose={
+        "ansible_host": "(nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).HostIP",
+        "ansible_port": "(nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).Value",
+    })[0]
     host = inventory.get_host("default.web.web.0")
-    assert host.vars["ansible_host"] == "192.0.2.8" and host.vars["ansible_port"] == 2222
-    name, q = client.services.get.call_args.args
-    assert name == "ssh" and q.namespace == "default"
+    assert host.vars["ansible_host"] == "10.0.0.5" and host.vars["ansible_port"] == 20022
 
 
-def test_service_without_registration_has_no_address(tmp_path):
+def test_services(tmp_path):
     client = client_with()
-    client.services.get.return_value = ([], QueryMeta())
-    inventory = run(tmp_path, client, allocations=True, allocation_address="service:ssh")[0]
-    assert "ansible_host" not in inventory.get_host("default.web.web.0").vars
+    client.services.list.return_value = ([ServiceRegistrationListStub(namespace="default", services=[
+        ServiceRegistrationStub(service_name="ssh"), ServiceRegistrationStub(service_name="other"),
+    ])], QueryMeta())
+    mine = ServiceRegistration(id="r1", service_name="ssh", alloc_id="a1", address="192.0.2.8", port=2222, tags=["v1"])
+    theirs = ServiceRegistration(id="r2", service_name="other", alloc_id="a9", address="192.0.2.9", port=80)
+    client.services.get.side_effect = lambda name, q: ([mine] if name == "ssh" else [theirs], QueryMeta())
+    inventory = run(tmp_path, client, allocations=True, services=True, namespace="default")[0]
+    host = inventory.get_host("default.web.web.0")
+    assert host.vars["nomad_services"] == [mine.to_json()]
+    assert client.services.list.call_args.args[0].namespace == "default"
+    assert sorted(c.args[0] for c in client.services.get.call_args_list) == ["other", "ssh"]
+    assert all(c.args[1].namespace == "default" for c in client.services.get.call_args_list)
 
 
-def test_meta_address(tmp_path):
-    second = AllocationListStub(id="a3", name="web.api[0]", namespace="default", node_id="n1", job_id="web", task_group="api", client_status="running")
-    client = client_with(allocations=[RUNNING, second])
-    job = Job(id="web", meta={"ansible_host": "job.example"}, task_groups=[
-        TaskGroup(name="web", meta={"ansible_host": "group.example"}, tasks=[Task(name="t", meta={"ansible_host": "task.example"})]),
-        TaskGroup(name="api", tasks=[Task(name="t")]),
-    ])
-    client.jobs.info.return_value = (job, QueryMeta())
-    inventory = run(tmp_path, client, allocations=True, allocation_address="meta:ansible_host")[0]
-    assert inventory.get_host("default.web.web.0").vars["ansible_host"] == "task.example"
-    assert inventory.get_host("default.web.api.0").vars["ansible_host"] == "job.example"
-    assert "ansible_nomad_task" not in inventory.get_host("default.web.api.0").vars  # no task states on the stub
-    client.jobs.info.assert_called_once()
-    assert client.jobs.info.call_args.args[0] == "web" and client.jobs.info.call_args.args[1].namespace == "default"
-
-
-def test_bad_strategy(tmp_path):
-    with pytest.raises(AnsibleParserError, match="allocation_address must be"):
-        run(tmp_path, client_with(), allocations=True, allocation_address="bogus")
+def test_allocation_without_registrations_has_an_empty_list(tmp_path):
+    client = client_with()
+    client.services.list.return_value = ([], QueryMeta())
+    inventory = run(tmp_path, client, allocations=True, services=True)[0]
+    assert inventory.get_host("default.web.web.0").vars["nomad_services"] == []
+    client.services.get.assert_not_called()
 
 
 def test_node_detail(tmp_path):

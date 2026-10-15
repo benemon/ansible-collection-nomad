@@ -26,7 +26,7 @@ options:
   task:
     description:
       - Name of the task to run in.
-      - The P(benemon.nomad.nomad#inventory) inventory plugin sets it on allocation hosts whose task group has one task.
+      - Set it in the play, or compose it from C(nomad_allocation.TaskStates) on the hosts of the P(benemon.nomad.nomad#inventory) inventory plugin.
     type: str
     vars:
       - name: ansible_nomad_task
@@ -133,10 +133,11 @@ notes:
 
 EXAMPLES = r"""
 # With an inventory from the benemon.nomad.nomad plugin (allocations: true), allocation hosts already carry
-# ansible_nomad_alloc_id, ansible_nomad_namespace and, for a single-task group, ansible_nomad_task.
+# ansible_nomad_alloc_id and ansible_nomad_namespace; the task is named in the play.
 - hosts: nomad_job_web
   connection: benemon.nomad.nomad_exec
   vars:
+    ansible_nomad_task: web
     ansible_nomad_address: https://nomad.example.com:4646
     ansible_nomad_token: "{{ nomad_token }}"
   tasks:
