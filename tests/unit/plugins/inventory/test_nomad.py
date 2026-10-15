@@ -31,7 +31,7 @@ NODE = NodeListStub(
     scheduling_eligibility="eligible", version="2.0.5",
     drivers={"raw_exec": DriverInfo(detected=True, healthy=True), "docker": DriverInfo(detected=False)},
 )
-MEMBER = AgentMember(name="server1.global", addr="10.0.0.1", port=4648, tags={"dc": "dc1", "region": "global"}, status="alive")
+MEMBER = AgentMember(name="server1.global", addr="10.0.0.1", port=4648, tags={"dc": "dc1", "region": "global", "rpc_addr": "10.0.0.2"}, status="alive")
 RUNNING = AllocationListStub(
     id="a1", name="web.web[0]", namespace="default", node_id="n1", node_name="node1", job_id="web", task_group="web", client_status="running",
     allocated_resources=AllocatedResources(shared=AllocatedSharedResources(
@@ -76,8 +76,8 @@ def test_clients_by_default(tmp_path):
     client = client_with()
     inventory = run(tmp_path, client)[0]
     host = inventory.get_host("node1")
-    assert host.vars["ansible_host"] == "10.0.0.5"
-    assert host.vars["nomad_node"]["ID"] == "n1" and host.vars["nomad_node"]["Datacenter"] == "dc1"
+    assert "ansible_host" not in host.vars
+    assert host.vars["nomad_node"]["ID"] == "n1" and host.vars["nomad_node"]["Address"] == "10.0.0.5"
     for group in ("nomad_clients", "nomad_datacenter_dc1", "nomad_node_pool_default", "nomad_status_ready",
                   "nomad_eligibility_eligible", "nomad_driver_raw_exec"):
         assert hosts_of(inventory, group) == ["node1"]
@@ -97,7 +97,8 @@ def test_node_class_group(tmp_path):
 def test_servers(tmp_path):
     inventory = run(tmp_path, client_with(), servers=True)[0]
     host = inventory.get_host("server1.global")
-    assert host.vars["ansible_host"] == "10.0.0.1" and host.vars["nomad_member"]["Tags"]["region"] == "global"
+    assert "ansible_host" not in host.vars
+    assert host.vars["nomad_member"]["Addr"] == "10.0.0.1" and host.vars["nomad_member"]["Tags"]["region"] == "global"
     assert hosts_of(inventory, "nomad_servers") == ["server1.global"]
     assert hosts_of(inventory, "nomad_datacenter_dc1") == ["node1", "server1.global"]
 
@@ -122,10 +123,13 @@ def test_allocations(tmp_path):
 
 
 def test_address_chosen_by_compose(tmp_path):
-    inventory = run(tmp_path, client_with(), allocations=True, compose={
-        "ansible_host": "(nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).HostIP",
-        "ansible_port": "(nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).Value",
+    inventory = run(tmp_path, client_with(), servers=True, allocations=True, compose={
+        "ansible_host": "nomad_member.Tags.rpc_addr if nomad_member is defined else nomad_node.Address if nomad_node is defined"
+                        " else (nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).HostIP",
+        "ansible_port": "(nomad_allocation.AllocatedResources.Shared.Ports | selectattr('Label', 'eq', 'ssh') | first).Value if nomad_allocation is defined",
     })[0]
+    assert inventory.get_host("node1").vars["ansible_host"] == "10.0.0.5"
+    assert inventory.get_host("server1.global").vars["ansible_host"] == "10.0.0.2"
     host = inventory.get_host("default.web.web.0")
     assert host.vars["ansible_host"] == "10.0.0.5" and host.vars["ansible_port"] == 20022
 
@@ -159,7 +163,7 @@ def test_node_detail(tmp_path):
     client.nodes.info.return_value = (Node(id="n1", name="node1", meta={"rack": "r1"}, attributes={"os.name": "linux"}), QueryMeta())
     inventory = run(tmp_path, client, node_detail=True)[0]
     host = inventory.get_host("node1")
-    assert host.vars["nomad_node"]["Meta"] == {"rack": "r1"} and host.vars["ansible_host"] == "10.0.0.5"
+    assert host.vars["nomad_node"]["Meta"] == {"rack": "r1"} and "ansible_host" not in host.vars
     client.nodes.info.assert_called_once_with("n1")
 
 

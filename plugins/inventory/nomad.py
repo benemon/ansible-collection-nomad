@@ -9,8 +9,8 @@ version_added: 0.2.0
 description:
   - Lists the client nodes of a Nomad cluster as hosts, and on request its server members and running allocations.
   - Host variables are the Nomad API documents with the API's field names, carrying every address the API attaches to
-    a host. A client node or server member has one address and gets it as C(ansible_host); an allocation has several
-    and gets none, so the play chooses with O(compose).
+    a host. The plugin sets no C(ansible_host); the inventory file chooses one with O(compose), and the guide shows the
+    expression for each kind of host.
   - Allocation hosts carry the allocation ID and namespace that P(benemon.nomad.nomad_exec#connection) needs.
   - Reads a YAML configuration file whose name ends in C(nomad.yml) or C(nomad.yaml).
 options:
@@ -59,14 +59,18 @@ author:
 """
 
 EXAMPLES = r"""
-# cluster.nomad.yml: client nodes, grouped by datacenter, node pool, class, status, eligibility and driver
+# cluster.nomad.yml: client nodes at their advertised address, grouped by datacenter, node pool, class, status,
+# eligibility and driver
 plugin: benemon.nomad.nomad
 address: https://nomad.example.com:4646
+compose:
+  ansible_host: nomad_node.Address
 
-# Server members and running allocations as well
+# Server members at their RPC address, client nodes at their advertised address
 plugin: benemon.nomad.nomad
 servers: true
-allocations: true
+compose:
+  ansible_host: nomad_member.Tags.rpc_addr if nomad_member is defined else nomad_node.Address
 
 # Virtual machines run as allocations: reach each guest at the host-mapped port its group labels "ssh"
 plugin: benemon.nomad.nomad
@@ -187,14 +191,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 if stub["NodeClass"]:
                     groups.append("nomad_node_class_" + stub["NodeClass"])
                 groups += ["nomad_driver_" + name for name, driver in (stub["Drivers"] or {}).items() if driver["Detected"]]
-                self._add(stub["Name"], groups, {"ansible_host": stub["Address"], "nomad_node": detail.get(stub["ID"], stub)}, strict)
+                self._add(stub["Name"], groups, {"nomad_node": detail.get(stub["ID"], stub)}, strict)
         if self.get_option("servers"):
             for member in payload["members"]:
                 groups = ["nomad_servers"]
                 datacenter = (member["Tags"] or {}).get("dc")
                 if datacenter:
                     groups.append("nomad_datacenter_" + datacenter)
-                self._add(member["Name"], groups, {"ansible_host": member["Addr"], "nomad_member": member}, strict)
+                self._add(member["Name"], groups, {"nomad_member": member}, strict)
         if self.get_option("allocations"):
             registrations = payload.get("services")
             for alloc in payload["allocations"]:
