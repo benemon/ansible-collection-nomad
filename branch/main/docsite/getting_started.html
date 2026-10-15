@@ -82,6 +82,7 @@
 <li class="toctree-l1"><a class="reference internal" href="jobs.html">Jobs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="secrets.html">Secrets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="inventory.html">Inventory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exec.html">Running tasks inside allocations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="enterprise.html">Enterprise behaviour</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
@@ -107,6 +108,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_info_module.html">benemon.nomad.nomad_sentinel_policy_info module – Read Nomad Sentinel policies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_variable_module.html">benemon.nomad.nomad_variable module – Manage a Nomad variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_variable_info_module.html">benemon.nomad.nomad_variable_info module – Read Nomad variables</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_exec_connection.html">benemon.nomad.nomad_exec connection – Run tasks inside a task of a Nomad allocation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_inventory.html">benemon.nomad.nomad inventory – Nomad client nodes, server members and allocations as hosts</a></li>
@@ -149,8 +153,9 @@ client. Every plugin runs on the controller or a delegated host that can reach
 the API; nothing runs on the Nomad servers themselves.</p>
 <section id="install">
 <h2>Install<a class="headerlink" href="#install" title="Link to this heading"></a></h2>
-<p>The collection requires ansible-core 2.19 or newer and nomadpy 0.1.0 or newer on
-the host that runs the plugins.</p>
+<p>The collection requires ansible-core 2.19 or newer, Python 3.11 or newer and
+nomadpy 0.2.0 or newer with its <code class="docutils literal notranslate"><span class="pre">exec</span></code> extra on the host that runs the
+plugins.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ansible-galaxy collection install benemon.nomad</span>
 <span class="go">pip install -r ~/.ansible/collections/ansible_collections/benemon/nomad/requirements.txt</span>
 </pre></div>
@@ -227,11 +232,12 @@ connection once with <code class="docutils literal notranslate"><span class="pre
 <span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Web tier</span>
 </pre></div>
 </div>
-<p>The <a class="reference internal" href="../nomad_variable_lookup.html#ansible-collections-benemon-nomad-nomad-variable-lookup"><span class="std std-ref">benemon.nomad.nomad_variable</span></a> lookup and the
-<a class="reference internal" href="../nomad_inventory.html#ansible-collections-benemon-nomad-nomad-inventory"><span class="std std-ref">benemon.nomad.nomad</span></a> inventory plugin are outside the
-action group and do not see <code class="docutils literal notranslate"><span class="pre">module_defaults</span></code>. Pass their connection options
-as keyword arguments or inventory file options, or set the environment
-variables.</p>
+<p>The <a class="reference internal" href="../nomad_variable_lookup.html#ansible-collections-benemon-nomad-nomad-variable-lookup"><span class="std std-ref">benemon.nomad.nomad_variable</span></a> lookup, the
+<a class="reference internal" href="../nomad_inventory.html#ansible-collections-benemon-nomad-nomad-inventory"><span class="std std-ref">benemon.nomad.nomad</span></a> inventory plugin and the
+<a class="reference internal" href="../nomad_exec_connection.html#ansible-collections-benemon-nomad-nomad-exec-connection"><span class="std std-ref">benemon.nomad.nomad_exec</span></a> connection plugin are outside
+the action group and do not see <code class="docutils literal notranslate"><span class="pre">module_defaults</span></code>. Pass their connection
+options as keyword arguments, inventory file options or <code class="docutils literal notranslate"><span class="pre">ansible_nomad_*</span></code>
+host variables, or set the environment variables.</p>
 </section>
 <section id="how-the-modules-behave">
 <h2>How the modules behave<a class="headerlink" href="#how-the-modules-behave" title="Link to this heading"></a></h2>

@@ -78,6 +78,7 @@
 <li class="toctree-l1"><a class="reference internal" href="docsite/jobs.html">Jobs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docsite/secrets.html">Secrets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docsite/inventory.html">Inventory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docsite/exec.html">Running tasks inside allocations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docsite/enterprise.html">Enterprise behaviour</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docsite/examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docsite/contributing.html">Contributing</a></li>
@@ -115,6 +116,9 @@
 <li class="toctree-l1"><a class="reference internal" href="nomad_sentinel_policy_info_module.html">benemon.nomad.nomad_sentinel_policy_info module – Read Nomad Sentinel policies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nomad_variable_module.html">benemon.nomad.nomad_variable module – Manage a Nomad variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nomad_variable_info_module.html">benemon.nomad.nomad_variable_info module – Read Nomad variables</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nomad_exec_connection.html">benemon.nomad.nomad_exec connection – Run tasks inside a task of a Nomad allocation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="nomad_inventory.html">benemon.nomad.nomad inventory – Nomad client nodes, server members and allocations as hosts</a></li>
@@ -184,7 +188,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <span id="ansible-collections-benemon-nomad-nomad-node-pool-info-module-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
 <p>The below requirements are needed on the host that executes this module.</p>
 <ul class="simple">
-<li><p>nomadpy &gt;= 0.1.0</p></li>
+<li><p>nomadpy &gt;= 0.2.0</p></li>
 </ul>
 </section>
 <section id="parameters">
@@ -201,7 +205,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <a class="ansibleOptionLink" href="#parameter-address" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Address of the Nomad HTTP API, including the scheme.</p>
-<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_ADDR</span></code>, then <code class="ansible-value docutils literal notranslate"><span class="pre">http://127.0.0.1:4646</span></code>.</p>
+<p>Falls back to <a class="reference internal" href="environment_variables.html#envvar-NOMAD_ADDR"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_ADDR</span></code></a>, then <code class="ansible-value docutils literal notranslate"><span class="pre">http://127.0.0.1:4646</span></code>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -209,7 +213,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <a class="ansibleOptionLink" href="#parameter-ca_cert" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Path to a CA certificate file to verify the server against.</p>
-<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CACERT</span></code>.</p>
+<p>Falls back to <a class="reference internal" href="environment_variables.html#envvar-NOMAD_CACERT"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CACERT</span></code></a>.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -217,7 +221,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <a class="ansibleOptionLink" href="#parameter-ca_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Path to a directory of CA certificates to verify the server against.</p>
-<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CAPATH</span></code>.</p>
+<p>Falls back to <a class="reference internal" href="environment_variables.html#envvar-NOMAD_CAPATH"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CAPATH</span></code></a>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -225,7 +229,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <a class="ansibleOptionLink" href="#parameter-client_cert" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Path to the client certificate for TLS authentication.</p>
-<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CLIENT_CERT</span></code>.</p>
+<p>Falls back to <a class="reference internal" href="environment_variables.html#envvar-NOMAD_CLIENT_CERT"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CLIENT_CERT</span></code></a>.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -233,7 +237,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <a class="ansibleOptionLink" href="#parameter-client_key" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Path to the private key of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-node-pool-info-module-parameter-client-cert"><span class="std std-ref"><span class="pre">client_cert</span></span></a></strong></code>.</p>
-<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CLIENT_KEY</span></code>.</p>
+<p>Falls back to <a class="reference internal" href="environment_variables.html#envvar-NOMAD_CLIENT_KEY"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CLIENT_KEY</span></code></a>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -248,7 +252,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <a class="ansibleOptionLink" href="#parameter-region" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Region to send requests to.</p>
-<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_REGION</span></code>, then the region of the server answering.</p>
+<p>Falls back to <a class="reference internal" href="environment_variables.html#envvar-NOMAD_REGION"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_REGION</span></code></a>, then the region of the server answering.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -256,7 +260,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <a class="ansibleOptionLink" href="#parameter-skip_verify" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Do not verify the server certificate.</p>
-<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_SKIP_VERIFY</span></code>.</p>
+<p>Falls back to <a class="reference internal" href="environment_variables.html#envvar-NOMAD_SKIP_VERIFY"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_SKIP_VERIFY</span></code></a>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
@@ -269,7 +273,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <a class="ansibleOptionLink" href="#parameter-tls_server_name" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Server name to verify the certificate against instead of the host in <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-benemon-nomad-nomad-node-pool-info-module-parameter-address"><span class="std std-ref"><span class="pre">address</span></span></a></strong></code>.</p>
-<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TLS_SERVER_NAME</span></code>.</p>
+<p>Falls back to <a class="reference internal" href="environment_variables.html#envvar-NOMAD_TLS_SERVER_NAME"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TLS_SERVER_NAME</span></code></a>.</p>
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
@@ -277,7 +281,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <a class="ansibleOptionLink" href="#parameter-token" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>ACL token secret sent with every request.</p>
-<p>Falls back to <code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TOKEN</span></code>.</p>
+<p>Falls back to <a class="reference internal" href="environment_variables.html#envvar-NOMAD_TOKEN"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TOKEN</span></code></a>.</p>
 </div></td>
 </tr>
 </tbody>

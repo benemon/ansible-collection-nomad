@@ -76,6 +76,7 @@
 <li class="toctree-l1"><a class="reference internal" href="docsite/jobs.html">Jobs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docsite/secrets.html">Secrets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docsite/inventory.html">Inventory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docsite/exec.html">Running tasks inside allocations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docsite/enterprise.html">Enterprise behaviour</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docsite/examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docsite/contributing.html">Contributing</a></li>
@@ -101,6 +102,9 @@
 <li class="toctree-l1"><a class="reference internal" href="nomad_sentinel_policy_info_module.html">benemon.nomad.nomad_sentinel_policy_info module – Read Nomad Sentinel policies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nomad_variable_module.html">benemon.nomad.nomad_variable module – Manage a Nomad variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nomad_variable_info_module.html">benemon.nomad.nomad_variable_info module – Read Nomad variables</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nomad_exec_connection.html">benemon.nomad.nomad_exec connection – Run tasks inside a task of a Nomad allocation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="nomad_inventory.html">benemon.nomad.nomad inventory – Nomad client nodes, server members and allocations as hosts</a></li>
@@ -185,6 +189,96 @@ Environment variables used by the ansible-core configuration are documented in <
 <dd><p>Merge extra vars into the available variables for composition (highest precedence).</p>
 <p><em>Used by:</em>
 <a class="reference internal" href="nomad_inventory.html#ansible-collections-benemon-nomad-nomad-inventory"><span class="std std-ref">benemon.nomad.nomad inventory plugin</span></a></p>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-NOMAD_ADDR">
+<span class="sig-name descname"><span class="pre">NOMAD_ADDR</span></span><a class="headerlink" href="#envvar-NOMAD_ADDR" title="Link to this definition"></a></dt>
+<dd><p>Address of the Nomad HTTP API, including the scheme.</p>
+<p>Falls back to <a class="reference internal" href="#envvar-NOMAD_ADDR"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_ADDR</span></code></a>, then <code class="ansible-value docutils literal notranslate"><span class="pre">http://127.0.0.1:4646</span></code>.</p>
+<p><em>Used by:</em>
+<a class="reference internal" href="nomad_exec_connection.html#ansible-collections-benemon-nomad-nomad-exec-connection"><span class="std std-ref">benemon.nomad.nomad_exec connection plugin</span></a></p>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-NOMAD_CACERT">
+<span class="sig-name descname"><span class="pre">NOMAD_CACERT</span></span><a class="headerlink" href="#envvar-NOMAD_CACERT" title="Link to this definition"></a></dt>
+<dd><p>Path to a CA certificate file to verify the server against.</p>
+<p>Falls back to <a class="reference internal" href="#envvar-NOMAD_CACERT"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CACERT</span></code></a>.</p>
+<p><em>Used by:</em>
+<a class="reference internal" href="nomad_exec_connection.html#ansible-collections-benemon-nomad-nomad-exec-connection"><span class="std std-ref">benemon.nomad.nomad_exec connection plugin</span></a></p>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-NOMAD_CAPATH">
+<span class="sig-name descname"><span class="pre">NOMAD_CAPATH</span></span><a class="headerlink" href="#envvar-NOMAD_CAPATH" title="Link to this definition"></a></dt>
+<dd><p>Path to a directory of CA certificates to verify the server against.</p>
+<p>Falls back to <a class="reference internal" href="#envvar-NOMAD_CAPATH"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CAPATH</span></code></a>.</p>
+<p><em>Used by:</em>
+<a class="reference internal" href="nomad_exec_connection.html#ansible-collections-benemon-nomad-nomad-exec-connection"><span class="std std-ref">benemon.nomad.nomad_exec connection plugin</span></a></p>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-NOMAD_CLIENT_CERT">
+<span class="sig-name descname"><span class="pre">NOMAD_CLIENT_CERT</span></span><a class="headerlink" href="#envvar-NOMAD_CLIENT_CERT" title="Link to this definition"></a></dt>
+<dd><p>Path to the client certificate for TLS authentication.</p>
+<p>Falls back to <a class="reference internal" href="#envvar-NOMAD_CLIENT_CERT"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CLIENT_CERT</span></code></a>.</p>
+<p><em>Used by:</em>
+<a class="reference internal" href="nomad_exec_connection.html#ansible-collections-benemon-nomad-nomad-exec-connection"><span class="std std-ref">benemon.nomad.nomad_exec connection plugin</span></a></p>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-NOMAD_CLIENT_KEY">
+<span class="sig-name descname"><span class="pre">NOMAD_CLIENT_KEY</span></span><a class="headerlink" href="#envvar-NOMAD_CLIENT_KEY" title="Link to this definition"></a></dt>
+<dd><p>Path to the private key of <code class="ansible-option docutils literal notranslate"><strong><span><span class="pre">client_cert</span></span></strong></code>.</p>
+<p>Falls back to <a class="reference internal" href="#envvar-NOMAD_CLIENT_KEY"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_CLIENT_KEY</span></code></a>.</p>
+<p><em>Used by:</em>
+<a class="reference internal" href="nomad_exec_connection.html#ansible-collections-benemon-nomad-nomad-exec-connection"><span class="std std-ref">benemon.nomad.nomad_exec connection plugin</span></a></p>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-NOMAD_NAMESPACE">
+<span class="sig-name descname"><span class="pre">NOMAD_NAMESPACE</span></span><a class="headerlink" href="#envvar-NOMAD_NAMESPACE" title="Link to this definition"></a></dt>
+<dd><p>Namespace of the allocation.</p>
+<p>Falls back to <a class="reference internal" href="#envvar-NOMAD_NAMESPACE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_NAMESPACE</span></code></a>, then <code class="ansible-value docutils literal notranslate"><span class="pre">default</span></code>.</p>
+<p><em>Used by:</em>
+<a class="reference internal" href="nomad_exec_connection.html#ansible-collections-benemon-nomad-nomad-exec-connection"><span class="std std-ref">benemon.nomad.nomad_exec connection plugin</span></a></p>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-NOMAD_REGION">
+<span class="sig-name descname"><span class="pre">NOMAD_REGION</span></span><a class="headerlink" href="#envvar-NOMAD_REGION" title="Link to this definition"></a></dt>
+<dd><p>Region to send requests to.</p>
+<p>Falls back to <a class="reference internal" href="#envvar-NOMAD_REGION"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_REGION</span></code></a>, then the region of the server answering.</p>
+<p><em>Used by:</em>
+<a class="reference internal" href="nomad_exec_connection.html#ansible-collections-benemon-nomad-nomad-exec-connection"><span class="std std-ref">benemon.nomad.nomad_exec connection plugin</span></a></p>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-NOMAD_SKIP_VERIFY">
+<span class="sig-name descname"><span class="pre">NOMAD_SKIP_VERIFY</span></span><a class="headerlink" href="#envvar-NOMAD_SKIP_VERIFY" title="Link to this definition"></a></dt>
+<dd><p>Do not verify the server certificate.</p>
+<p>Falls back to <a class="reference internal" href="#envvar-NOMAD_SKIP_VERIFY"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_SKIP_VERIFY</span></code></a>.</p>
+<p><em>Used by:</em>
+<a class="reference internal" href="nomad_exec_connection.html#ansible-collections-benemon-nomad-nomad-exec-connection"><span class="std std-ref">benemon.nomad.nomad_exec connection plugin</span></a></p>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-NOMAD_TLS_SERVER_NAME">
+<span class="sig-name descname"><span class="pre">NOMAD_TLS_SERVER_NAME</span></span><a class="headerlink" href="#envvar-NOMAD_TLS_SERVER_NAME" title="Link to this definition"></a></dt>
+<dd><p>Server name to verify the certificate against instead of the host in <code class="ansible-option docutils literal notranslate"><strong><span><span class="pre">address</span></span></strong></code>.</p>
+<p>Falls back to <a class="reference internal" href="#envvar-NOMAD_TLS_SERVER_NAME"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TLS_SERVER_NAME</span></code></a>.</p>
+<p><em>Used by:</em>
+<a class="reference internal" href="nomad_exec_connection.html#ansible-collections-benemon-nomad-nomad-exec-connection"><span class="std std-ref">benemon.nomad.nomad_exec connection plugin</span></a></p>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-NOMAD_TOKEN">
+<span class="sig-name descname"><span class="pre">NOMAD_TOKEN</span></span><a class="headerlink" href="#envvar-NOMAD_TOKEN" title="Link to this definition"></a></dt>
+<dd><p>ACL token secret sent with every request.</p>
+<p>Falls back to <a class="reference internal" href="#envvar-NOMAD_TOKEN"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">NOMAD_TOKEN</span></code></a>.</p>
+<p><em>Used by:</em>
+<a class="reference internal" href="nomad_exec_connection.html#ansible-collections-benemon-nomad-nomad-exec-connection"><span class="std std-ref">benemon.nomad.nomad_exec connection plugin</span></a></p>
 </dd></dl>
 
 </section>

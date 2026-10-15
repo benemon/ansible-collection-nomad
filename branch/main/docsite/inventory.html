@@ -21,7 +21,7 @@
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Enterprise behaviour" href="enterprise.html" />
+    <link rel="next" title="Running tasks inside allocations" href="exec.html" />
     <link rel="prev" title="Secrets" href="secrets.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
 
 
@@ -84,6 +84,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#caching">Caching</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="exec.html">Running tasks inside allocations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="enterprise.html">Enterprise behaviour</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
@@ -109,6 +110,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../nomad_sentinel_policy_info_module.html">benemon.nomad.nomad_sentinel_policy_info module – Read Nomad Sentinel policies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_variable_module.html">benemon.nomad.nomad_variable module – Manage a Nomad variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_variable_info_module.html">benemon.nomad.nomad_variable_info module – Read Nomad variables</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nomad_exec_connection.html">benemon.nomad.nomad_exec connection – Run tasks inside a task of a Nomad allocation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../nomad_inventory.html">benemon.nomad.nomad inventory – Nomad client nodes, server members and allocations as hosts</a></li>
@@ -305,6 +309,10 @@ group, then at the job. One job read per job with running allocations.</p>
 </dl>
 <p>An allocation whose address is not found by the chosen strategy is still a
 host, without <code class="docutils literal notranslate"><span class="pre">ansible_host</span></code>.</p>
+<p>Every allocation host also carries <code class="docutils literal notranslate"><span class="pre">ansible_nomad_alloc_id</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ansible_nomad_namespace</span></code>, and <code class="docutils literal notranslate"><span class="pre">ansible_nomad_task</span></code> when its task group
+has one task, so <a class="reference internal" href="exec.html#ansible-collections-benemon-nomad-docsite-exec"><span class="std std-ref">Running tasks inside allocations</span></a> works
+on it without further variables.</p>
 </section>
 <section id="node-detail">
 <h2>Node detail<a class="headerlink" href="#node-detail" title="Link to this heading"></a></h2>
@@ -337,7 +345,7 @@ touching the API, until the cache times out or <code class="docutils literal not
 
 <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="secrets.html" class="btn btn-neutral float-left" title="Secrets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="enterprise.html" class="btn btn-neutral float-right" title="Enterprise behaviour" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="exec.html" class="btn btn-neutral float-right" title="Running tasks inside allocations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
