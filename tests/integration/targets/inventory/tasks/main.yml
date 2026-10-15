@@ -14,6 +14,8 @@
       base:
         servers: true
         allocations: true
+        compose:
+          ansible_host: nomad_member.Tags.rpc_addr if nomad_member is defined else nomad_node.Address if nomad_node is defined
       services:
         clients: false
         allocations: true
@@ -111,15 +113,20 @@
           - inventories.base.nomad_status_ready.hosts == [node_name]
           - inventories.base.nomad_eligibility_eligible.hosts == [node_name]
           - inventories.base._meta.hostvars[node_name].ansible_host == node_address
+          - inventories.base._meta.hostvars[node_name].nomad_node.Address == node_address
           - inventories.base._meta.hostvars[node_name].nomad_node.ID == nodes.nodes[0].ID
+          - "'ansible_host' not in inventories.detail._meta.hostvars[node_name]"
           - "'Meta' not in inventories.base._meta.hostvars[node_name].nomad_node"
 
     - name: The server member is a host
       ansible.builtin.assert:
         that:
           - inventories.base.nomad_servers.hosts | length == 1
-          - inventories.base._meta.hostvars[inventories.base.nomad_servers.hosts[0]].ansible_host is string
-          - inventories.base._meta.hostvars[inventories.base.nomad_servers.hosts[0]].nomad_member.Tags.role == 'nomad'
+          - member.ansible_host == member.nomad_member.Tags.rpc_addr
+          - member.nomad_member.Addr is string
+          - member.nomad_member.Tags.role == 'nomad'
+      vars:
+        member: "{{ inventories.base._meta.hostvars[inventories.base.nomad_servers.hosts[0]] }}"
 
     - name: The allocation is a host carrying its document and the exec variables, with no address chosen
       ansible.builtin.assert:
