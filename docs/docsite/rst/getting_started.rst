@@ -12,7 +12,7 @@ Install
 -------
 
 The collection requires ansible-core 2.19 or newer, Python 3.11 or newer and
-nomadpy 0.2.0 or newer with its ``exec`` extra on the host that runs the
+nomadpy with its ``exec`` extra, at the version ``requirements.txt`` names, on the host that runs the
 plugins.
 
 .. code-block:: console

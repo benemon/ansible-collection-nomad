@@ -29,7 +29,7 @@ Enterprise request fails with the server's own error.
 ## Install
 
 Requires ansible-core 2.19 or newer on Python 3.11 or newer, and nomadpy
-0.2.0 or newer with its `exec` extra.
+with its `exec` extra at the version `requirements.txt` names.
 
 ```
 ansible-galaxy collection install benemon.nomad

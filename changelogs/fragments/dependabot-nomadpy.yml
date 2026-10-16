@@ -1,0 +1,2 @@
+trivial:
+  - Dependabot raises the nomadpy floor in requirements.txt to each release; the README, getting started page and connection plugin no longer repeat the version.
