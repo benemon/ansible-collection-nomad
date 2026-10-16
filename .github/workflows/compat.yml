@@ -6,7 +6,7 @@ name: compat
 # failure opens or updates an issue labelled compat.
 on:
   schedule:
-    - cron: "47 6 * * *"
+    - cron: "47 6 * * 1"
   workflow_dispatch:
 
 permissions:

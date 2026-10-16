@@ -50,7 +50,7 @@ when the ``NOMAD_LICENCE`` repository secret is set, so a fork without the
 secret runs the Community lane and stays green.
 
 ``.nomad-version`` pins the newest Nomad release for CI; a green ``main`` is
-the compatibility claim for that release. The ``compat`` workflow runs daily
+the compatibility claim for that release. The ``compat`` workflow runs weekly
 against what moves: it builds Nomad from upstream main for the Community lane
 and takes the newest Enterprise release, which has no public source, with
 nomadpy as PyPI serves it. A failure opens an issue labelled ``compat``, or
