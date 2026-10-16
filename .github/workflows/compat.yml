@@ -1,0 +1,113 @@
+name: compat
+
+# Runs the integration targets against the newest Nomad releases with nomadpy as PyPI serves it, independent of
+# the version ci pins. A failure opens or updates an issue labelled compat.
+on:
+  schedule:
+    - cron: "47 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  releases:
+    runs-on: ubuntu-latest
+    outputs:
+      community: ${{ steps.latest.outputs.community }}
+      enterprise: ${{ steps.latest.outputs.enterprise }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Newest releases
+        id: latest
+        run: |
+          set -euo pipefail
+          curl -sfL https://releases.hashicorp.com/nomad/index.json -o "$RUNNER_TEMP/index.json"
+          eval "$(python3 - "$RUNNER_TEMP/index.json" <<'EOF'
+          import json, re, sys
+          versions = json.load(open(sys.argv[1]))["versions"]
+          def latest(pattern):
+              found = [v for v in versions if re.fullmatch(pattern, v)]
+              return max(found, key=lambda v: [int(n) for n in v.split("+")[0].split(".")])
+          print("community=" + latest(r"\d+\.\d+\.\d+"))
+          print("enterprise=" + latest(r"\d+\.\d+\.\d+[+]ent"))
+          EOF
+          )"
+          printf 'community=%s\nenterprise=%s\n' "$community" "$enterprise" >> "$GITHUB_OUTPUT"
+          pinned=$(awk -F'"' '/^  NOMAD_VERSION:/ {print $2}' .github/workflows/ci.yml)
+          printf 'Newest Nomad: %s and %s; ci pins %s.\n' "$community" "$enterprise" "$pinned" >> "$GITHUB_STEP_SUMMARY"
+
+  live:
+    name: live (${{ matrix.lane }})
+    needs: releases
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [community, enterprise]
+    env:
+      NOMAD_LICENSE: ${{ matrix.lane == 'enterprise' && secrets.NOMAD_LICENCE || '' }}
+    defaults:
+      run:
+        working-directory: ansible_collections/benemon/nomad
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: ansible_collections/benemon/nomad
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - name: Install the newest Nomad
+        run: |
+          set -euo pipefail
+          v="${{ needs.releases.outputs.community }}"
+          [ "${{ matrix.lane }}" = enterprise ] && v="${{ needs.releases.outputs.enterprise }}"
+          z="nomad_${v}_linux_amd64.zip"
+          curl -sfLO "https://releases.hashicorp.com/nomad/${v}/${z}"
+          curl -sfLO "https://releases.hashicorp.com/nomad/${v}/nomad_${v}_SHA256SUMS"
+          grep "${z}" "nomad_${v}_SHA256SUMS" | sha256sum -c -
+          mkdir -p "$HOME/nomad"
+          unzip -oq "${z}" nomad -d "$HOME/nomad"
+          rm -f "${z}" "nomad_${v}_SHA256SUMS"
+          if [ "${{ matrix.lane }}" = enterprise ]; then
+            echo "NOMADPY_TEST_ENT_BIN=$HOME/nomad/nomad" >> "$GITHUB_ENV"
+          else
+            echo "NOMADPY_TEST_CE_BIN=$HOME/nomad/nomad" >> "$GITHUB_ENV"
+          fi
+          echo "Nomad ${v}" >> "$GITHUB_STEP_SUMMARY"
+      - name: Write the Enterprise licence
+        if: ${{ matrix.lane == 'enterprise' && env.NOMAD_LICENSE != '' }}
+        run: |
+          umask 077
+          printf '%s\n' "$NOMAD_LICENSE" > "$HOME/nomad.hclic"
+          echo "NOMAD_LICENSE_PATH=$HOME/nomad.hclic" >> "$GITHUB_ENV"
+      - run: python -m pip install "ansible-core==2.21.*" -r requirements.txt
+      - run: python -m pip show nomadpy | grep ^Version >> "$GITHUB_STEP_SUMMARY"
+      - name: Integration
+        if: ${{ matrix.lane == 'community' || env.NOMAD_LICENSE != '' }}
+        run: python tests/integration/run.py --python 3.13
+
+  alert:
+    needs: [releases, live]
+    if: ${{ always() && contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Open or update the compat issue
+        run: |
+          set -euo pipefail
+          title="Nomad ${{ needs.releases.outputs.community }} / ${{ needs.releases.outputs.enterprise }}: compatibility check failed"
+          body="Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          releases: ${{ needs.releases.result }}, live: ${{ needs.live.result }}."
+          gh label create compat --repo "$GITHUB_REPOSITORY" --color B60205 --force \
+            --description "The newest Nomad release breaks the collection"
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label compat --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --label compat --body "$body"
+          fi
