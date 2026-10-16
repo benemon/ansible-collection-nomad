@@ -32,7 +32,7 @@ def exec_returning(rc, out=b"", err=b""):
 def test_exec_command():
     client = mock.MagicMock()
     client.allocations.exec = exec_returning(3, b"hello\n", b"oops\n")
-    conn, config = connection(client, ansible_nomad_namespace="web", ansible_nomad_timeout=30)
+    conn, config = connection(client, ansible_nomad_namespace="web", ansible_nomad_exec_timeout=30)
     assert config.address == "http://option:4646" and config.secret_id == "tok"
     assert conn.exec_command("echo hello", in_data=b"input") == (3, b"hello\n", b"oops\n")
     alloc_id, task, command = client.allocations.exec.call_args.args
@@ -96,3 +96,14 @@ def test_server_error_is_a_connection_failure():
     conn, _config = connection(client)
     with pytest.raises(AnsibleConnectionFailure, match="403.*Permission denied"):
         conn.exec_command("true")
+
+
+def test_timeout_unset_ignores_the_connection_timeout_keyword():
+    client = mock.MagicMock()
+    client.allocations.exec = exec_returning(0)
+    conn = connection_loader.get("benemon.nomad.nomad_exec", PlayContext())
+    conn.set_options(task_keys={"timeout": 10}, var_options=HOST)
+    with mock.patch.object(module_utils.nomadpy, "Client", return_value=client):
+        conn._connect()
+    conn.exec_command("true")
+    assert client.allocations.exec.call_args.kwargs["timeout"] is None

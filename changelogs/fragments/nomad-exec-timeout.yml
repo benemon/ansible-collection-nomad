@@ -1,0 +1,4 @@
+bugfixes:
+  - nomad_exec connection - with no timeout set, a wait for the exec connection or for output had no bound as documented but stopped after the connection timeout keyword's 10 seconds, so a command silent for longer failed (https://github.com/benemon/ansible-collection-nomad/issues/18).
+breaking_changes:
+  - nomad_exec connection - the exec timeout variable ``ansible_nomad_timeout`` is renamed ``ansible_nomad_exec_timeout``, matching the option name ``exec_timeout``.

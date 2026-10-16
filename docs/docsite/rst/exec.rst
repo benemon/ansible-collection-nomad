@@ -78,7 +78,7 @@ not.
 
 Commands run as the task's user. ``become`` is not supported.
 
-``ansible_nomad_timeout`` bounds, in seconds, the wait for the exec
+``ansible_nomad_exec_timeout`` bounds, in seconds, the wait for the exec
 connection to open and for each frame of output. Unset, a wait has no bound.
 
 The ACL policy of the token needs ``alloc-exec`` on the namespace, and

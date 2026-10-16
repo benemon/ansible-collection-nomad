@@ -39,13 +39,14 @@ options:
       - name: ansible_nomad_namespace
     env:
       - name: NOMAD_NAMESPACE
-  timeout:
+  # Not named timeout: ansible-core fills a connection option of that name from the connection timeout keyword (10s).
+  exec_timeout:
     description:
       - Seconds to wait for the exec connection to open and for each frame of output.
       - Unset, a wait has no bound.
     type: float
     vars:
-      - name: ansible_nomad_timeout
+      - name: ansible_nomad_exec_timeout
   address:
     description:
       - Address of the Nomad HTTP API, including the scheme.
@@ -224,7 +225,7 @@ class Connection(ConnectionBase):
         namespace = self.get_option("namespace")
         try:
             return self._client.allocations.exec(alloc_id, self.get_option("task"), command, stdin=stdin, stdout=stdout, stderr=stderr,
-                                                 q=QueryOptions(namespace=namespace) if namespace else None, timeout=self.get_option("timeout"))
+                                                 q=QueryOptions(namespace=namespace) if namespace else None, timeout=self.get_option("exec_timeout"))
         except UnexpectedResponseError as e:
             raise AnsibleConnectionFailure("exec in allocation %s: %s" % (alloc_id, e)) from e
         except urllib.error.URLError as e:
