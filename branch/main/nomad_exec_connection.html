@@ -389,6 +389,7 @@ For example, an ansible.cfg entry (further up in the list) is overwritten by an 
 <p class="admonition-title">Note</p>
 <ul class="simple">
 <li><p>Enterprise features are not checked client-side. On a Community server the request fails with the server’s own error.</p></li>
+<li><p>Modules do not run in tasks on the podman driver, whose exec sessions never deliver the end of stdin. Only <a class="reference external" href="https://docs.ansible.com/projects/ansible/devel/collections/ansible/builtin/raw_module.html#ansible-collections-ansible-builtin-raw-module" title="(in Ansible devel)"><span class="xref std std-ref">ansible.builtin.raw</span></a> works there.</p></li>
 </ul>
 </div>
 </section>

@@ -216,6 +216,12 @@ hosts needs only the connection and the task name:</p>
 POSIX shell and <code class="docutils literal notranslate"><span class="pre">cat</span></code>. Modules need Python in the task, found through
 <code class="docutils literal notranslate"><span class="pre">ansible_python_interpreter</span></code> as on any host; raw commands and <code class="docutils literal notranslate"><span class="pre">raw</span></code> do
 not.</p>
+<p>Modules also need the exec session to deliver the end of stdin. A module’s
+payload reaches the interpreter over stdin, and so does a file sent to
+<code class="docutils literal notranslate"><span class="pre">cat</span></code>. Tasks on the podman driver receive the data but never its end, so
+a module there waits until <code class="docutils literal notranslate"><span class="pre">ansible_nomad_exec_timeout</span></code> runs out, and
+indefinitely when it is unset. Only <code class="docutils literal notranslate"><span class="pre">raw</span></code> works in a podman task.
+Turning pipelining off does not help, because files travel over stdin too.</p>
 <p>Commands run as the task’s user. <code class="docutils literal notranslate"><span class="pre">become</span></code> is not supported.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ansible_nomad_exec_timeout</span></code> bounds, in seconds, the wait for the exec
 connection to open and for each frame of output. Unset, a wait has no bound.</p>
