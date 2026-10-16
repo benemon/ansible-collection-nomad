@@ -1,2 +1,0 @@
-known_issues:
-  - nomad_exec connection - modules do not run in tasks on the podman driver, whose exec sessions never deliver the end of stdin; only ``ansible.builtin.raw`` works there (https://github.com/benemon/ansible-collection-nomad/issues/17).

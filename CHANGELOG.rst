@@ -4,6 +4,31 @@ benemon.nomad Release Notes
 
 .. contents:: Topics
 
+v0.3.0
+======
+
+Release Summary
+---------------
+
+Exec fixes: the ``nomad_exec`` connection no longer bounds an unset exec timeout at the connection
+timeout keyword's 10 seconds; its timeout variable is renamed ``ansible_nomad_exec_timeout``, which is a
+breaking change. The exec guide records that modules do not run in tasks on the podman driver.
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- nomad_exec connection - the exec timeout variable ``ansible_nomad_timeout`` is renamed ``ansible_nomad_exec_timeout``, matching the option name ``exec_timeout``.
+
+Bugfixes
+--------
+
+- nomad_exec connection - with no timeout set, a wait for the exec connection or for output was documented as having no bound but stopped after the connection timeout keyword's 10 seconds, so a command silent for longer failed (https://github.com/benemon/ansible-collection-nomad/issues/18).
+
+Known Issues
+------------
+
+- nomad_exec connection - modules do not run in tasks on the podman driver, whose exec sessions never deliver the end of stdin; only ``ansible.builtin.raw`` works there (https://github.com/benemon/ansible-collection-nomad/issues/17).
+
 v0.2.0
 ======
 
