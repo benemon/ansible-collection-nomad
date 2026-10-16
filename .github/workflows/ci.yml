@@ -12,9 +12,6 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  NOMAD_VERSION: "2.0.5"
-
 jobs:
   sanity:
     runs-on: ubuntu-latest
@@ -62,7 +59,7 @@ jobs:
           set -euo pipefail
           edition=""
           [ "${{ matrix.lane }}" = enterprise ] && edition="+ent"
-          v="${NOMAD_VERSION}${edition}"
+          v="$(cat .nomad-version)${edition}"
           z="nomad_${v}_linux_amd64.zip"
           curl -sfLO "https://releases.hashicorp.com/nomad/${v}/${z}"
           curl -sfLO "https://releases.hashicorp.com/nomad/${v}/nomad_${v}_SHA256SUMS"

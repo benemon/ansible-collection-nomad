@@ -49,10 +49,14 @@ ansible-core. It downloads both editions of Nomad and runs the Enterprise lane
 when the ``NOMAD_LICENCE`` repository secret is set, so a fork without the
 secret runs the Community lane and stays green.
 
-The ``compat`` workflow runs daily. It runs the integration targets against
-the newest Community and Enterprise releases with nomadpy as PyPI serves it,
-independent of the version ``ci`` pins. A failure opens an issue labelled
-``compat``, or comments on the open one for the same versions.
+``.nomad-version`` pins the newest Nomad release for CI; a green ``main`` is
+the compatibility claim for that release. The ``compat`` workflow runs daily
+against what moves: it builds Nomad from upstream main for the Community lane
+and takes the newest Enterprise release, which has no public source, with
+nomadpy as PyPI serves it. A failure opens an issue labelled ``compat``, or
+comments on the open one for the same versions. When a newer release appears
+it opens a PR moving ``.nomad-version``, which needs the ``COMPAT_PR_TOKEN``
+repository secret, a fine-grained token with contents and pull-requests write.
 
 Documentation
 -------------
