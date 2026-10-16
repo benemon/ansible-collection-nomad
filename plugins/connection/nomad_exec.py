@@ -39,7 +39,7 @@ options:
       - name: ansible_nomad_namespace
     env:
       - name: NOMAD_NAMESPACE
-  # Not named timeout: ansible-core fills a connection option of that name from the connection timeout keyword (10s).
+  # Not named timeout: ansible-core fills a connection option of that name from the connection timeout keyword (default 10s).
   exec_timeout:
     description:
       - Seconds to wait for the exec connection to open and for each frame of output.
