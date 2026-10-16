@@ -1,0 +1,2 @@
+trivial:
+  - A daily compat workflow runs the integration targets against the newest Nomad releases.
