@@ -195,6 +195,10 @@ on the Community lane. A target for an Enterprise surface must pass on both.</p>
 ansible-core. It downloads both editions of Nomad and runs the Enterprise lane
 when the <code class="docutils literal notranslate"><span class="pre">NOMAD_LICENCE</span></code> repository secret is set, so a fork without the
 secret runs the Community lane and stays green.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">compat</span></code> workflow runs daily. It runs the integration targets against
+the newest Community and Enterprise releases with nomadpy as PyPI serves it,
+independent of the version <code class="docutils literal notranslate"><span class="pre">ci</span></code> pins. A failure opens an issue labelled
+<code class="docutils literal notranslate"><span class="pre">compat</span></code>, or comments on the open one for the same versions.</p>
 </section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h2>
