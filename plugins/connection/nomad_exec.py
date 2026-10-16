@@ -130,6 +130,8 @@ options:
       - name: NOMAD_SKIP_VERIFY
 notes:
   - Enterprise features are not checked client-side. On a Community server the request fails with the server's own error.
+  - Modules do not run in tasks on the podman driver, whose exec sessions never deliver the end of stdin. Only
+    M(ansible.builtin.raw) works there.
 """
 
 EXAMPLES = r"""
