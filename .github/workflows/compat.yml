@@ -1,7 +1,9 @@
 name: compat
 
-# Runs the integration targets against the newest Nomad releases with nomadpy as PyPI serves it, independent of
-# the version ci pins. A failure opens or updates an issue labelled compat.
+# ci pins the newest Nomad release in .nomad-version; a green main is the compatibility claim for that release.
+# This workflow watches what moves: a Community build at upstream main, the newest Enterprise release, and the
+# release index, opening a pin-bump PR when a newer release appears. nomadpy is installed as PyPI serves it. A
+# failure opens or updates an issue labelled compat.
 on:
   schedule:
     - cron: "47 6 * * *"
@@ -16,6 +18,7 @@ jobs:
     outputs:
       community: ${{ steps.latest.outputs.community }}
       enterprise: ${{ steps.latest.outputs.enterprise }}
+      pinned: ${{ steps.latest.outputs.pinned }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Newest releases
@@ -33,9 +36,42 @@ jobs:
           print("enterprise=" + latest(r"\d+\.\d+\.\d+[+]ent"))
           EOF
           )"
-          printf 'community=%s\nenterprise=%s\n' "$community" "$enterprise" >> "$GITHUB_OUTPUT"
-          pinned=$(awk -F'"' '/^  NOMAD_VERSION:/ {print $2}' .github/workflows/ci.yml)
+          pinned=$(cat .nomad-version)
+          printf 'community=%s\nenterprise=%s\npinned=%s\n' "$community" "$enterprise" "$pinned" >> "$GITHUB_OUTPUT"
           printf 'Newest Nomad: %s and %s; ci pins %s.\n' "$community" "$enterprise" "$pinned" >> "$GITHUB_STEP_SUMMARY"
+
+  pin:
+    needs: releases
+    if: ${{ needs.releases.outputs.community != needs.releases.outputs.pinned }}
+    runs-on: ubuntu-latest
+    env:
+      # A fine-grained token with contents and pull-requests write: a PR opened with the workflow token gets no
+      # checks, so it could never merge.
+      GH_TOKEN: ${{ secrets.COMPAT_PR_TOKEN }}
+      VERSION: ${{ needs.releases.outputs.community }}
+    steps:
+      - if: ${{ env.GH_TOKEN == '' }}
+        run: echo "ci pins ${{ needs.releases.outputs.pinned }} and Nomad ${VERSION} is out; set the COMPAT_PR_TOKEN secret for the pin-bump PR." >> "$GITHUB_STEP_SUMMARY"
+      - if: ${{ env.GH_TOKEN != '' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          token: ${{ secrets.COMPAT_PR_TOKEN }}
+      - if: ${{ env.GH_TOKEN != '' }}
+        name: Open the pin-bump PR
+        run: |
+          set -euo pipefail
+          branch="nomad-${VERSION}"
+          if [ "$(gh pr list --head "$branch" --state open --json number --jq length)" != 0 ]; then
+            echo "A PR from ${branch} is already open." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          printf '%s\n' "$VERSION" > .nomad-version
+          git commit -am "ci: pin Nomad ${VERSION}"
+          git push -u origin "$branch"
+          gh pr create --title "ci: pin Nomad ${VERSION}" --body "Moves the ci pin from ${{ needs.releases.outputs.pinned }} to ${VERSION}, the newest release. A green run here is the compatibility claim for it."
 
   live:
     name: live (${{ matrix.lane }})
@@ -57,11 +93,27 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.13"
-      - name: Install the newest Nomad
+      # Community is built from upstream main. Enterprise has no public source, so its lane takes the newest release.
+      - if: ${{ matrix.lane == 'community' }}
+        run: git clone -q --depth 1 https://github.com/hashicorp/nomad "$RUNNER_TEMP/nomad-src"
+      - if: ${{ matrix.lane == 'community' }}
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: ${{ runner.temp }}/nomad-src/go.mod
+          cache-dependency-path: ${{ runner.temp }}/nomad-src/go.sum
+      - if: ${{ matrix.lane == 'community' }}
+        name: Build Nomad from main
         run: |
           set -euo pipefail
-          v="${{ needs.releases.outputs.community }}"
-          [ "${{ matrix.lane }}" = enterprise ] && v="${{ needs.releases.outputs.enterprise }}"
+          mkdir -p "$HOME/nomad"
+          cd "$RUNNER_TEMP/nomad-src" && go build -o "$HOME/nomad/nomad" .
+          echo "NOMADPY_TEST_CE_BIN=$HOME/nomad/nomad" >> "$GITHUB_ENV"
+          echo "Nomad main $(git rev-parse --short HEAD): $("$HOME/nomad/nomad" version | head -1)" >> "$GITHUB_STEP_SUMMARY"
+      - if: ${{ matrix.lane == 'enterprise' }}
+        name: Install the newest Enterprise release
+        run: |
+          set -euo pipefail
+          v="${{ needs.releases.outputs.enterprise }}"
           z="nomad_${v}_linux_amd64.zip"
           curl -sfLO "https://releases.hashicorp.com/nomad/${v}/${z}"
           curl -sfLO "https://releases.hashicorp.com/nomad/${v}/nomad_${v}_SHA256SUMS"
@@ -69,11 +121,7 @@ jobs:
           mkdir -p "$HOME/nomad"
           unzip -oq "${z}" nomad -d "$HOME/nomad"
           rm -f "${z}" "nomad_${v}_SHA256SUMS"
-          if [ "${{ matrix.lane }}" = enterprise ]; then
-            echo "NOMADPY_TEST_ENT_BIN=$HOME/nomad/nomad" >> "$GITHUB_ENV"
-          else
-            echo "NOMADPY_TEST_CE_BIN=$HOME/nomad/nomad" >> "$GITHUB_ENV"
-          fi
+          echo "NOMADPY_TEST_ENT_BIN=$HOME/nomad/nomad" >> "$GITHUB_ENV"
           echo "Nomad ${v}" >> "$GITHUB_STEP_SUMMARY"
       - name: Write the Enterprise licence
         if: ${{ matrix.lane == 'enterprise' && env.NOMAD_LICENSE != '' }}
@@ -99,12 +147,12 @@ jobs:
       - name: Open or update the compat issue
         run: |
           set -euo pipefail
-          title="Nomad ${{ needs.releases.outputs.community }} / ${{ needs.releases.outputs.enterprise }}: compatibility check failed"
+          title="Nomad main / ${{ needs.releases.outputs.enterprise }}: compatibility check failed"
           body="Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
           releases: ${{ needs.releases.result }}, live: ${{ needs.live.result }}."
           gh label create compat --repo "$GITHUB_REPOSITORY" --color B60205 --force \
-            --description "The newest Nomad release breaks the collection"
+            --description "Upstream Nomad main or the newest Enterprise release breaks the collection"
           existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label compat --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"

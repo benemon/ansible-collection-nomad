@@ -1,2 +1,2 @@
 trivial:
-  - A daily compat workflow runs the integration targets against the newest Nomad releases.
+  - CI pins the newest Nomad release in .nomad-version; a daily compat workflow runs the integration targets against a Nomad build from upstream main and the newest Enterprise release.
