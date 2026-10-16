@@ -217,7 +217,7 @@ POSIX shell and <code class="docutils literal notranslate"><span class="pre">cat
 <code class="docutils literal notranslate"><span class="pre">ansible_python_interpreter</span></code> as on any host; raw commands and <code class="docutils literal notranslate"><span class="pre">raw</span></code> do
 not.</p>
 <p>Commands run as the task’s user. <code class="docutils literal notranslate"><span class="pre">become</span></code> is not supported.</p>
-<p><code class="docutils literal notranslate"><span class="pre">ansible_nomad_timeout</span></code> bounds, in seconds, the wait for the exec
+<p><code class="docutils literal notranslate"><span class="pre">ansible_nomad_exec_timeout</span></code> bounds, in seconds, the wait for the exec
 connection to open and for each frame of output. Unset, a wait has no bound.</p>
 <p>The ACL policy of the token needs <code class="docutils literal notranslate"><span class="pre">alloc-exec</span></code> on the namespace, and
 <code class="docutils literal notranslate"><span class="pre">alloc-node-exec</span></code> as well for tasks on the <code class="docutils literal notranslate"><span class="pre">raw_exec</span></code> driver.</p>
