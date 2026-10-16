@@ -14,7 +14,7 @@ description:
 author:
   - Benjamin Holmes (@benemon)
 requirements:
-  - nomadpy[exec] >= 0.2.0
+  - nomadpy[exec], at the version requirements.txt names
 options:
   alloc_id:
     description:

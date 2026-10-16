@@ -1,7 +1,11 @@
-# No pip entry: requirements.txt holds a floor on nomadpy, not a pin, so there
-# is nothing for Dependabot to bump there.
 version: 2
 updates:
+  # requirements.txt holds a floor on nomadpy; increase raises it to each release so ci runs against it.
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    versioning-strategy: increase
   - package-ecosystem: github-actions
     directory: /
     schedule:
