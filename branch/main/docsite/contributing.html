@@ -196,7 +196,7 @@ ansible-core. It downloads both editions of Nomad and runs the Enterprise lane
 when the <code class="docutils literal notranslate"><span class="pre">NOMAD_LICENCE</span></code> repository secret is set, so a fork without the
 secret runs the Community lane and stays green.</p>
 <p><code class="docutils literal notranslate"><span class="pre">.nomad-version</span></code> pins the newest Nomad release for CI; a green <code class="docutils literal notranslate"><span class="pre">main</span></code> is
-the compatibility claim for that release. The <code class="docutils literal notranslate"><span class="pre">compat</span></code> workflow runs daily
+the compatibility claim for that release. The <code class="docutils literal notranslate"><span class="pre">compat</span></code> workflow runs weekly
 against what moves: it builds Nomad from upstream main for the Community lane
 and takes the newest Enterprise release, which has no public source, with
 nomadpy as PyPI serves it. A failure opens an issue labelled <code class="docutils literal notranslate"><span class="pre">compat</span></code>, or
