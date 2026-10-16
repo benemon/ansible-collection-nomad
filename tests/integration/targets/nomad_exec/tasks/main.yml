@@ -48,7 +48,7 @@
         ansible_nomad_task: t
         ansible_nomad_address: "{{ nomad_address }}"
         ansible_nomad_token: "{{ nomad_token }}"
-        ansible_nomad_timeout: 60
+        ansible_nomad_exec_timeout: 60
         # raw_exec runs on the agent's host, so the controller's interpreter is in the task's view.
         ansible_python_interpreter: "{{ ansible_playbook_python }}"
         ansible_remote_tmp: "{{ workdir.path }}/remote"
@@ -96,6 +96,27 @@
       ansible.builtin.assert:
         that:
           - lookup('ansible.builtin.file', workdir.path ~ '/fetched/sent.txt') == 'sent through the exec channel'
+
+    - name: Add the allocation again with no timeout set
+      ansible.builtin.add_host:
+        name: exec-alloc-unbounded
+        ansible_connection: benemon.nomad.nomad_exec
+        ansible_nomad_alloc_id: "{{ hostvars['exec-alloc'].ansible_nomad_alloc_id }}"
+        ansible_nomad_task: t
+        ansible_nomad_address: "{{ nomad_address }}"
+        ansible_nomad_token: "{{ nomad_token }}"
+      changed_when: false
+
+    - name: A command silent for longer than the connection timeout default
+      ansible.builtin.raw: sleep 12; echo done
+      delegate_to: exec-alloc-unbounded
+      register: silent
+      changed_when: false
+
+    - name: The wait had no bound
+      ansible.builtin.assert:
+        that:
+          - silent.stdout | trim == 'done'
   always:
     - name: Stop and purge the job
       benemon.nomad.nomad_job:
