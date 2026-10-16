@@ -195,10 +195,14 @@ on the Community lane. A target for an Enterprise surface must pass on both.</p>
 ansible-core. It downloads both editions of Nomad and runs the Enterprise lane
 when the <code class="docutils literal notranslate"><span class="pre">NOMAD_LICENCE</span></code> repository secret is set, so a fork without the
 secret runs the Community lane and stays green.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">compat</span></code> workflow runs daily. It runs the integration targets against
-the newest Community and Enterprise releases with nomadpy as PyPI serves it,
-independent of the version <code class="docutils literal notranslate"><span class="pre">ci</span></code> pins. A failure opens an issue labelled
-<code class="docutils literal notranslate"><span class="pre">compat</span></code>, or comments on the open one for the same versions.</p>
+<p><code class="docutils literal notranslate"><span class="pre">.nomad-version</span></code> pins the newest Nomad release for CI; a green <code class="docutils literal notranslate"><span class="pre">main</span></code> is
+the compatibility claim for that release. The <code class="docutils literal notranslate"><span class="pre">compat</span></code> workflow runs daily
+against what moves: it builds Nomad from upstream main for the Community lane
+and takes the newest Enterprise release, which has no public source, with
+nomadpy as PyPI serves it. A failure opens an issue labelled <code class="docutils literal notranslate"><span class="pre">compat</span></code>, or
+comments on the open one for the same versions. When a newer release appears
+it opens a PR moving <code class="docutils literal notranslate"><span class="pre">.nomad-version</span></code>, which needs the <code class="docutils literal notranslate"><span class="pre">COMPAT_PR_TOKEN</span></code>
+repository secret, a fine-grained token with contents and pull-requests write.</p>
 </section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h2>
