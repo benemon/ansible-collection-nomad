@@ -156,8 +156,8 @@ the API; nothing runs on the Nomad servers themselves.</p>
 <section id="install">
 <h2>Install<a class="headerlink" href="#install" title="Link to this heading"></a></h2>
 <p>The collection requires ansible-core 2.19 or newer, Python 3.11 or newer and
-nomadpy 0.2.0 or newer with its <code class="docutils literal notranslate"><span class="pre">exec</span></code> extra on the host that runs the
-plugins.</p>
+nomadpy with its <code class="docutils literal notranslate"><span class="pre">exec</span></code> extra, at the version <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> names, on
+the host that runs the plugins.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ansible-galaxy collection install benemon.nomad</span>
 <span class="go">pip install -r ~/.ansible/collections/ansible_collections/benemon/nomad/requirements.txt</span>
 </pre></div>
