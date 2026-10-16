@@ -76,6 +76,13 @@ POSIX shell and ``cat``. Modules need Python in the task, found through
 ``ansible_python_interpreter`` as on any host; raw commands and ``raw`` do
 not.
 
+Modules also need the exec session to deliver the end of stdin. A module's
+payload reaches the interpreter over stdin, and so does a file sent to
+``cat``. Tasks on the podman driver receive the data but never its end, so
+a module there waits until ``ansible_nomad_exec_timeout`` runs out, and
+indefinitely when it is unset. Only ``raw`` works in a podman task.
+Turning pipelining off does not help, because files travel over stdin too.
+
 Commands run as the task's user. ``become`` is not supported.
 
 ``ansible_nomad_exec_timeout`` bounds, in seconds, the wait for the exec
