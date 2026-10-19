@@ -4,6 +4,20 @@ benemon.nomad Release Notes
 
 .. contents:: Topics
 
+v0.3.1
+======
+
+Release Summary
+---------------
+
+Bugfix release: ``nomad_job`` no longer fails waiting on an evaluation when it registers a periodic or parameterized
+job, which creates none.
+
+Bugfixes
+--------
+
+- nomad_job - registering a periodic or parameterized job with O(wait=true) no longer fails looking up an evaluation that does not exist (https://github.com/benemon/ansible-collection-nomad/issues/28).
+
 v0.3.0
 ======
 
