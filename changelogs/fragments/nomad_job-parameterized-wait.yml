@@ -1,0 +1,2 @@
+bugfixes:
+  - nomad_job - registering a periodic or parameterized job with O(wait=true) no longer fails looking up an evaluation that does not exist (https://github.com/benemon/ansible-collection-nomad/issues/28).
