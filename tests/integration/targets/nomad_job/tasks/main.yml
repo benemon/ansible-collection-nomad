@@ -149,6 +149,31 @@
       register: ns_conflict
       ignore_errors: true
 
+    - name: Register a parameterized job, which creates no evaluation
+      benemon.nomad.nomad_job:
+        jobspec: |
+          job "dispatch" {
+            datacenters = ["dc1"]
+            type        = "batch"
+            parameterized {}
+            group "g" {
+              task "t" {
+                driver = "raw_exec"
+                config {
+                  command = "/bin/true"
+                }
+              }
+            }
+          }
+      register: parameterized
+
+    - name: Purge the parameterized job
+      benemon.nomad.nomad_job:
+        name: dispatch
+        state: absent
+        purge: true
+      register: parameterized_purged
+
     - name: Stop the job
       benemon.nomad.nomad_job:
         name: web
@@ -188,6 +213,9 @@
           - "'not HCL' in vars_conflict.msg"
           - ns_conflict is failed
           - "'Namespace' in ns_conflict.msg"
+          - parameterized is changed
+          - not parameterized.eval_id
+          - parameterized_purged is changed
           - stopped is changed
           - stopped.diff.before.ID == 'web'
           - stopped_again is not changed

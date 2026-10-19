@@ -54,6 +54,7 @@ options:
     description:
       - Wait for the evaluation to complete and, for service jobs, for the latest deployment to reach a terminal status.
       - Failed placements and failed deployments fail the task.
+      - Registering a periodic or parameterized job creates no evaluation, so there is nothing to wait for.
     type: bool
     default: true
   timeout:
@@ -103,7 +104,7 @@ job:
   returned: when O(state=present)
   type: dict
 eval_id:
-  description: ID of the evaluation the change created.
+  description: ID of the evaluation the change created; empty when it created none, as for a periodic or parameterized job.
   returned: when a write was made
   type: str
 deployment:
@@ -250,7 +251,7 @@ def main():
 
         resp = client.jobs.register(job, policy_override=p["policy_override"], submission=submission)[0]
         result["eval_id"] = resp.eval_id
-        if p["wait"]:
+        if p["wait"] and resp.eval_id:
             wait_for_eval(module, client, resp.eval_id, deadline)
             dep = wait_for_deployment(module, client, job_id, deadline)
             if dep is not None:
