@@ -366,6 +366,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 </div></td>
 <td><div class="ansible-option-cell"><p>Wait for the evaluation to complete and, for service jobs, for the latest deployment to reach a terminal status.</p>
 <p>Failed placements and failed deployments fail the task.</p>
+<p>Registering a periodic or parameterized job creates no evaluation, so there is nothing to wait for.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
@@ -438,7 +439,7 @@ see <a class="reference internal" href="#ansible-collections-benemon-nomad-nomad
 <div class="ansibleOptionAnchor" id="return-eval_id"></div><p class="ansible-option-title" id="ansible-collections-benemon-nomad-nomad-job-module-return-eval-id"><strong>eval_id</strong></p>
 <a class="ansibleOptionLink" href="#return-eval_id" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>ID of the evaluation the change created.</p>
+<td><div class="ansible-option-cell"><p>ID of the evaluation the change created; empty when it created none, as for a periodic or parameterized job.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> when a write was made</p>
 </div></td>
 </tr>
