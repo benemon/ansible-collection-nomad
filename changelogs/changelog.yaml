@@ -151,3 +151,20 @@ releases:
     - nomad-exec-timeout.yml
     - release-summary.yml
     release_date: '2026-10-16'
+  0.3.1:
+    changes:
+      bugfixes:
+      - nomad_job - registering a periodic or parameterized job with O(wait=true)
+        no longer fails looking up an evaluation that does not exist (https://github.com/benemon/ansible-collection-nomad/issues/28).
+      release_summary: 'Bugfix release: ``nomad_job`` no longer fails waiting on an
+        evaluation when it registers a periodic or parameterized
+
+        job, which creates none.
+
+        '
+    fragments:
+    - compat-workflow.yml
+    - dependabot-nomadpy.yml
+    - nomad_job-parameterized-wait.yml
+    - release-summary.yml
+    release_date: '2026-10-19'
