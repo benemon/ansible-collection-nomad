@@ -38,7 +38,7 @@ Fields on Community resources
 What a Community server answers
 -------------------------------
 
-The responses below are what Nomad Community 2.0.5 returns. The collection's
+The responses below are what Nomad Community 2.1.1 returns. The collection's
 integration tests assert them on the Community lane.
 
 .. list-table::
