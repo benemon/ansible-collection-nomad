@@ -4,6 +4,14 @@ benemon.nomad Release Notes
 
 .. contents:: Topics
 
+v0.3.2
+======
+
+Bugfixes
+--------
+
+- nomad_node_pool - changing a node pool on Nomad 2.1 or later no longer removes the pool's batch job queue configuration; the collection now requires nomadpy 0.3.0 or later, which carries the field.
+
 v0.3.1
 ======
 
