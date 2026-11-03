@@ -168,3 +168,12 @@ releases:
     - nomad_job-parameterized-wait.yml
     - release-summary.yml
     release_date: '2026-10-19'
+  0.3.2:
+    changes:
+      bugfixes:
+      - nomad_node_pool - changing a node pool on Nomad 2.1 or later no longer removes
+        the pool's batch job queue configuration; the collection now requires nomadpy
+        0.3.0 or later, which carries the field.
+    fragments:
+    - nomadpy-0.3.0.yml
+    release_date: '2026-11-03'

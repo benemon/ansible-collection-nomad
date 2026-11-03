@@ -1,6 +1,6 @@
 namespace: benemon
 name: nomad
-version: 0.3.1
+version: 0.3.2
 readme: README.md
 authors:
   - Benjamin Holmes (@benemon)
