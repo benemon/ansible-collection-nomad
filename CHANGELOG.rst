@@ -4,6 +4,20 @@ benemon.nomad Release Notes
 
 .. contents:: Topics
 
+v0.4.0
+======
+
+Release Summary
+---------------
+
+Dynamic host volumes: ``nomad_volume`` creates, updates, registers and deletes volumes, including waiting until a volume is ready for scheduling; ``nomad_volume_info`` reads them.
+
+New Modules
+-----------
+
+- benemon.nomad.nomad_volume - Manage a Nomad dynamic host volume.
+- benemon.nomad.nomad_volume_info - Read Nomad dynamic host volumes.
+
 v0.3.2
 ======
 
