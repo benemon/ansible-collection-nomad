@@ -177,3 +177,18 @@ releases:
     fragments:
     - nomadpy-0.3.0.yml
     release_date: '2026-11-03'
+  0.4.0:
+    changes:
+      release_summary: 'Dynamic host volumes: ``nomad_volume`` creates, updates, registers
+        and deletes volumes, including waiting until a volume is ready for scheduling;
+        ``nomad_volume_info`` reads them.'
+    fragments:
+    - nomad-volume.yml
+    modules:
+    - description: Manage a Nomad dynamic host volume.
+      name: nomad_volume
+      namespace: ''
+    - description: Read Nomad dynamic host volumes.
+      name: nomad_volume_info
+      namespace: ''
+    release_date: '2026-11-27'
