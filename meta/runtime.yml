@@ -24,3 +24,5 @@ action_groups:
     - nomad_sentinel_policy_info
     - nomad_variable
     - nomad_variable_info
+    - nomad_volume
+    - nomad_volume_info

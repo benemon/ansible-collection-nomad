@@ -1,0 +1,3 @@
+release_summary: >-
+  Dynamic host volumes: ``nomad_volume`` creates, updates, registers and deletes volumes,
+  including waiting until a volume is ready for scheduling; ``nomad_volume_info`` reads them.

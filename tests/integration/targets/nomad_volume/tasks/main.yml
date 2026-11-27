@@ -1,0 +1,232 @@
+- name: Connection from the lane
+  module_defaults:
+    group/benemon.nomad.nomad:
+      address: "{{ nomad_address }}"
+      token: "{{ nomad_token }}"
+  block:
+    - name: Create a temporary directory to register
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: nomad-volume-
+      register: volume_directory
+
+    - name: Create a dynamic host volume and wait for it
+      benemon.nomad.nomad_volume:
+        name: data
+        node_pool: default
+        plugin_id: mkdir
+        capabilities:
+          - access_mode: single-node-writer
+            attachment_mode: file-system
+        parameters:
+          mode: "0700"
+        wait: true
+      register: created
+
+    - name: Read the volume's node
+      benemon.nomad.nomad_node_info:
+        node_id: "{{ created.volume.NodeID }}"
+      register: volume_node
+
+    - name: Create the volume again with the same options
+      benemon.nomad.nomad_volume:
+        name: data
+        node_pool: default
+        plugin_id: mkdir
+        capabilities:
+          - access_mode: single-node-writer
+            attachment_mode: file-system
+        parameters:
+          mode: "0700"
+        wait: true
+      register: again
+
+    - name: Change the mode in check mode
+      benemon.nomad.nomad_volume:
+        name: data
+        node_pool: default
+        plugin_id: mkdir
+        capabilities:
+          - access_mode: single-node-writer
+            attachment_mode: file-system
+        parameters:
+          mode: "0755"
+        wait: true
+      check_mode: true
+      diff: true
+      register: checked
+
+    - name: Read the volume after the check-mode change
+      benemon.nomad.nomad_volume_info:
+        id: "{{ created.volume.ID }}"
+      register: after_check
+
+    - name: The create, rerun and check-mode update behave as promised
+      ansible.builtin.assert:
+        that:
+          - created is changed
+          - created.volume.State == 'ready'
+          - volume_node.nodes[0].HostVolumes.data.ID == created.volume.ID
+          - again is not changed
+          - again.volume.ID == created.volume.ID
+          - checked is changed
+          - checked.diff.before.Parameters.mode == '0700'
+          - checked.diff.after.Parameters.mode == '0755'
+          - after_check.volumes[0].Parameters.mode == '0700'
+
+    - name: Change the mode for real
+      benemon.nomad.nomad_volume:
+        name: data
+        node_pool: default
+        plugin_id: mkdir
+        capabilities:
+          - access_mode: single-node-writer
+            attachment_mode: file-system
+        parameters:
+          mode: "0755"
+        wait: true
+      register: updated
+
+    - name: Read the updated volume
+      benemon.nomad.nomad_volume_info:
+        id: "{{ created.volume.ID }}"
+      register: after_update
+
+    - name: The update keeps the volume ID and changes the parameters
+      ansible.builtin.assert:
+        that:
+          - updated is changed
+          - updated.volume.ID == created.volume.ID
+          - updated.volume.State == 'ready'
+          - after_update.volumes[0].Parameters.mode == '0755'
+
+    - name: Create a namespace for the cross-namespace platform pin
+      benemon.nomad.nomad_namespace:
+        name: volumes
+
+    - name: Creating the same volume name on the same node across namespaces fails
+      benemon.nomad.nomad_volume:
+        name: data
+        namespace: volumes
+        node_id: "{{ created.volume.NodeID }}"
+        plugin_id: mkdir
+        wait: false
+      register: duplicate_name
+      ignore_errors: true
+
+    - name: The server reports the cross-namespace name collision
+      ansible.builtin.assert:
+        that:
+          - duplicate_name is failed
+          - duplicate_name.status_code == 500
+          - "'volume name already exists on this node' in duplicate_name.msg"
+
+    - name: Register an existing directory and wait for it
+      benemon.nomad.nomad_volume:
+        name: reg
+        node_id: "{{ created.volume.NodeID }}"
+        host_path: "{{ volume_directory.path }}"
+        wait: true
+      register: registered
+
+    - name: Register the directory again
+      benemon.nomad.nomad_volume:
+        name: reg
+        node_id: "{{ created.volume.NodeID }}"
+        host_path: "{{ volume_directory.path }}"
+        wait: true
+      register: registered_again
+
+    - name: List the data volume by exact name
+      benemon.nomad.nomad_volume_info:
+        name: data
+      register: listed
+
+    - name: Read the full data volume by ID
+      benemon.nomad.nomad_volume_info:
+        id: "{{ created.volume.ID }}"
+      register: full
+
+    - name: Register and info operations converge
+      ansible.builtin.assert:
+        that:
+          - registered is changed
+          - registered.volume.State == 'ready'
+          - registered_again is not changed
+          - registered_again.volume.ID == registered.volume.ID
+          - listed.volumes | length == 1
+          - listed.volumes[0].Name == 'data'
+          - full.volumes | length == 1
+          - full.volumes[0].ID == created.volume.ID
+          - full.volumes[0].Parameters.mode == '0755'
+
+    - name: Delete the data volume
+      benemon.nomad.nomad_volume:
+        name: data
+        state: absent
+      register: data_deleted
+
+    - name: Delete the registered volume
+      benemon.nomad.nomad_volume:
+        name: reg
+        node_id: "{{ created.volume.NodeID }}"
+        state: absent
+      register: reg_deleted
+
+    - name: Delete the data volume again
+      benemon.nomad.nomad_volume:
+        name: data
+        state: absent
+      register: data_deleted_again
+
+    - name: Delete the registered volume again
+      benemon.nomad.nomad_volume:
+        name: reg
+        node_id: "{{ created.volume.NodeID }}"
+        state: absent
+      register: reg_deleted_again
+
+    - name: List the deleted data volume
+      benemon.nomad.nomad_volume_info:
+        name: data
+      register: after_delete
+
+    - name: Deletes converge and the volume is gone
+      ansible.builtin.assert:
+        that:
+          - data_deleted is changed
+          - reg_deleted is changed
+          - data_deleted_again is not changed
+          - reg_deleted_again is not changed
+          - after_delete.volumes == []
+  always:
+    - name: Remove the data volume after the test
+      benemon.nomad.nomad_volume:
+        name: data
+        state: absent
+      ignore_errors: true
+
+    - name: Remove the registered volume after the test
+      benemon.nomad.nomad_volume:
+        name: reg
+        state: absent
+      ignore_errors: true
+
+    - name: Remove a cross-namespace volume if the platform pin unexpectedly created it
+      benemon.nomad.nomad_volume:
+        name: data
+        namespace: volumes
+        state: absent
+      ignore_errors: true
+
+    - name: Remove the test namespace
+      benemon.nomad.nomad_namespace:
+        name: volumes
+        state: absent
+      ignore_errors: true
+
+    - name: Remove the registered directory
+      ansible.builtin.file:
+        path: "{{ volume_directory.path }}"
+        state: absent
+      when: volume_directory is defined
